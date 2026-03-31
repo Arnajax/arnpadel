@@ -22,21 +22,12 @@ const MONTH_NL = [
   "jul", "aug", "sep", "okt", "nov", "dec",
 ];
 
-function parseDate(dateStr: string): Date {
-  // handle both "2025-05-05" and "2025-05-05T10:00:00"
-  return new Date(dateStr);
+function toDateKey(d: Date): string {
+  return d.toISOString().slice(0, 10);
 }
 
-function getDayAbbr(dateStr: string): string {
-  return DAY_NL[parseDate(dateStr).getDay()];
-}
-
-function getDayNum(dateStr: string): number {
-  return parseDate(dateStr).getDate();
-}
-
-function getMonthAbbr(dateStr: string): string {
-  return MONTH_NL[parseDate(dateStr).getMonth()];
+function slotDateKey(dateStr: string): string {
+  return dateStr.slice(0, 10);
 }
 
 function getTime(slot: Slot): string {
@@ -45,17 +36,6 @@ function getTime(slot: Slot): string {
 
 function getPrice(players: number): number {
   return players <= 2 ? 80 : 90;
-}
-
-function SkeletonCard() {
-  return (
-    <div className="slot-card animate-pulse">
-      <div style={{ height: 16, background: "#1a1a2e22", borderRadius: 6, width: "40%", marginBottom: 8 }} />
-      <div style={{ height: 36, background: "#1a1a2e22", borderRadius: 6, width: "60%", marginBottom: 8 }} />
-      <div style={{ height: 14, background: "#1a1a2e11", borderRadius: 6, width: "30%", marginBottom: 20 }} />
-      <div style={{ height: 42, background: "#00c27c33", borderRadius: 10 }} />
-    </div>
-  );
 }
 
 function ChevronDown() {
@@ -78,7 +58,9 @@ function CheckCircle() {
 export default function Home() {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
+  const [weekDays, setWeekDays] = useState<Date[]>([]);
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [selectedSlotIds, setSelectedSlotIds] = useState<Set<string | number>>(new Set());
   const [formData, setFormData] = useState<FormData>({ name: "", phone: "", players: 2 });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -86,26 +68,73 @@ export default function Home() {
 
   const slotsRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
+  const prevSlotCount = useRef(0);
+
+  useEffect(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    setWeekDays(
+      Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(today);
+        d.setDate(today.getDate() + i);
+        return d;
+      })
+    );
+  }, []);
 
   useEffect(() => {
     fetch("/api/slots")
       .then((res) => res.json())
-      .then((data: { slots?: Slot[] } | Slot[]) => { setSlots(Array.isArray(data) ? data : (data.slots ?? [])); setLoading(false); })
+      .then((data: { slots?: Slot[] } | Slot[]) => {
+        setSlots(Array.isArray(data) ? data : (data.slots ?? []));
+        setLoading(false);
+      })
       .catch(() => { setSlots([]); setLoading(false); });
   }, []);
 
-  function handleSelectSlot(slot: Slot) {
-    setSelectedSlot(slot);
-    setSuccess(false);
+  useEffect(() => {
+    if (selectedSlotIds.size > 0 && prevSlotCount.current === 0) {
+      setTimeout(() => {
+        formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      }, 50);
+    }
+    prevSlotCount.current = selectedSlotIds.size;
+  }, [selectedSlotIds.size]);
+
+  function hasSlotsForDate(dateKey: string): boolean {
+    return slots.some((s) => slotDateKey(s.date) === dateKey);
+  }
+
+  function slotsForDate(dateKey: string): Slot[] {
+    return slots.filter((s) => slotDateKey(s.date) === dateKey);
+  }
+
+  function handleSelectDate(dateKey: string) {
+    if (!hasSlotsForDate(dateKey)) return;
+    setSelectedDate(dateKey);
+    setSelectedSlotIds(new Set());
     setError(null);
     setTimeout(() => {
-      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+      slotsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 50);
+  }
+
+  function toggleSlot(id: string | number) {
+    setSelectedSlotIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+    setError(null);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!selectedSlot) { setError("Selecteer eerst een slot hierboven."); return; }
+    if (selectedSlotIds.size === 0) {
+      setError("Selecteer eerst een of meer slots hierboven.");
+      return;
+    }
     setSubmitting(true);
     setError(null);
 
@@ -117,7 +146,7 @@ export default function Home() {
           name: formData.name,
           phone: formData.phone,
           players: formData.players,
-          slotId: selectedSlot.id,
+          slotIds: Array.from(selectedSlotIds),
         }),
       });
       if (!res.ok) {
@@ -126,7 +155,8 @@ export default function Home() {
       }
       setSuccess(true);
       setFormData({ name: "", phone: "", players: 2 });
-      setSelectedSlot(null);
+      setSelectedSlotIds(new Set());
+      setSelectedDate(null);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Er is iets misgegaan.");
     } finally {
@@ -134,7 +164,10 @@ export default function Home() {
     }
   }
 
+  const selectedSlotsData = slots.filter((s) => selectedSlotIds.has(s.id));
   const price = getPrice(formData.players);
+  const totalPrice = price * selectedSlotIds.size;
+  const daySlots = selectedDate ? slotsForDate(selectedDate) : [];
 
   return (
     <div className="page-root">
@@ -175,14 +208,16 @@ export default function Home() {
         </button>
       </section>
 
-      {/* ── SLOTS ── */}
+      {/* ── STEP 1: WEEK CALENDAR STRIP ── */}
       <section className="slots-section" ref={slotsRef}>
         <div className="section-inner">
           <h2 className="section-title">Kies je moment</h2>
 
           {loading ? (
-            <div className="slots-grid">
-              {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
+            <div className="cal-strip">
+              {Array.from({ length: 7 }).map((_, i) => (
+                <div key={i} className="cal-day cal-day--skeleton" />
+              ))}
             </div>
           ) : slots.length === 0 ? (
             <div className="empty-state">
@@ -198,143 +233,165 @@ export default function Home() {
               op Instagram voor updates.
             </div>
           ) : (
-            <div className="slots-grid">
-              {slots.map((slot) => {
-                const isSelected = selectedSlot?.id === slot.id;
-                const time = getTime(slot);
+            <div className="cal-strip">
+              {weekDays.map((d) => {
+                const key = toDateKey(d);
+                const available = hasSlotsForDate(key);
+                const isSelected = selectedDate === key;
                 return (
-                  <div
-                    key={slot.id}
-                    className={`slot-card${isSelected ? " slot-card--selected" : ""}`}
+                  <button
+                    key={key}
+                    className={`cal-day${available ? " cal-day--available" : " cal-day--disabled"}${isSelected ? " cal-day--active" : ""}`}
+                    onClick={() => handleSelectDate(key)}
+                    disabled={!available}
+                    aria-pressed={isSelected}
                   >
-                    <div className="slot-date">
-                      <span className="slot-day">{getDayAbbr(slot.date)}</span>
-                      <span className="slot-num">{getDayNum(slot.date)}</span>
-                      <span className="slot-month">{getMonthAbbr(slot.date)}</span>
-                    </div>
-                    <div className="slot-time">{time}</div>
-                    <div className="slot-meta">
-                      <span className="slot-pill">{slot.duration} min</span>
-                    </div>
-                    <div className="slot-price">vanaf €80</div>
-                    <button
-                      className={`slot-btn${isSelected ? " slot-btn--active" : ""}`}
-                      onClick={() => handleSelectSlot(slot)}
-                    >
-                      {isSelected ? "Geselecteerd ✓" : "Boek"}
-                    </button>
-                  </div>
+                    <span className="cal-day-abbr">{DAY_NL[d.getDay()]}</span>
+                    <span className="cal-day-num">{d.getDate()}</span>
+                    <span className="cal-day-month">{MONTH_NL[d.getMonth()]}</span>
+                    {available && <span className="cal-dot" />}
+                  </button>
                 );
               })}
             </div>
           )}
-        </div>
-      </section>
 
-      {/* ── BOOKING FORM ── */}
-      <section className="form-section" ref={formRef}>
-        <div className="section-inner">
-          {success ? (
-            <div className="success-block">
-              <CheckCircle />
-              <h3 className="success-title">Aanvraag ontvangen!</h3>
-              <p className="success-sub">
-                Arn stuurt je een WhatsApp bevestiging.
-              </p>
-              <button
-                className="btn-primary"
-                style={{ marginTop: 24 }}
-                onClick={() => { setSuccess(false); slotsRef.current?.scrollIntoView({ behavior: "smooth" }); }}
-              >
-                Nog een slot boeken
-              </button>
-            </div>
-          ) : (
-            <>
-              <h2 className="section-title section-title--light">Aanvraag indienen</h2>
-
-              {selectedSlot && (
-                <div className="selected-pill">
-                  <span className="selected-pill-dot" />
-                  {getDayAbbr(selectedSlot.date)}&nbsp;{getDayNum(selectedSlot.date)}&nbsp;{getMonthAbbr(selectedSlot.date)}&nbsp;·&nbsp;{getTime(selectedSlot)}
-                </div>
-              )}
-
-              {!selectedSlot && (
-                <p className="form-hint">
-                  Selecteer eerst een slot hierboven om verder te gaan.
+          {/* ── STEP 2: TIME SLOT CHIPS ── */}
+          {selectedDate && daySlots.length > 0 && (
+            <div className="chips-section">
+              <div className="chips-row">
+                {daySlots.map((slot) => {
+                  const isChipSelected = selectedSlotIds.has(slot.id);
+                  return (
+                    <button
+                      key={slot.id}
+                      className={`chip${isChipSelected ? " chip--active" : ""}`}
+                      onClick={() => toggleSlot(slot.id)}
+                      aria-pressed={isChipSelected}
+                    >
+                      <span className="chip-time">{getTime(slot)}</span>
+                      <span className="chip-dur">{slot.duration} min</span>
+                    </button>
+                  );
+                })}
+              </div>
+              {selectedSlotIds.size > 0 && (
+                <p className="slot-count">
+                  {selectedSlotIds.size} slot{selectedSlotIds.size > 1 ? "s" : ""} geselecteerd
                 </p>
               )}
-
-              {error && (
-                <div className="error-msg">{error}</div>
-              )}
-
-              <form onSubmit={handleSubmit} className="booking-form">
-                <div className="field">
-                  <label className="field-label" htmlFor="name">Naam</label>
-                  <input
-                    id="name"
-                    type="text"
-                    required
-                    className="field-input"
-                    placeholder="Jouw naam"
-                    value={formData.name}
-                    onChange={(e) => setFormData((f) => ({ ...f, name: e.target.value }))}
-                  />
-                </div>
-
-                <div className="field">
-                  <label className="field-label" htmlFor="phone">Telefoon</label>
-                  <input
-                    id="phone"
-                    type="tel"
-                    required
-                    className="field-input"
-                    placeholder="06 12 34 56 78"
-                    value={formData.phone}
-                    onChange={(e) => setFormData((f) => ({ ...f, phone: e.target.value }))}
-                  />
-                </div>
-
-                <div className="field">
-                  <label className="field-label">Aantal spelers</label>
-                  <div className="players-grid">
-                    {[1, 2, 3, 4].map((n) => (
-                      <button
-                        key={n}
-                        type="button"
-                        className={`player-btn${formData.players === n ? " player-btn--active" : ""}`}
-                        onClick={() => setFormData((f) => ({ ...f, players: n }))}
-                      >
-                        {n}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="price-hint">
-                    Totaal: <strong style={{ color: "#00c27c" }}>€{price}</strong>
-                  </p>
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={submitting || !selectedSlot}
-                  className="btn-primary btn-submit"
-                >
-                  {submitting ? (
-                    <span className="spinner-row">
-                      <span className="spinner" />
-                      Versturen…
-                    </span>
-                  ) : (
-                    "Verstuur aanvraag 🎾"
-                  )}
-                </button>
-              </form>
-            </>
+            </div>
           )}
         </div>
       </section>
+
+      {/* ── STEP 3: BOOKING FORM ── */}
+      {selectedSlotIds.size > 0 && (
+        <section className="form-section" ref={formRef}>
+          <div className="section-inner">
+            {success ? (
+              <div className="success-block">
+                <CheckCircle />
+                <h3 className="success-title">Aanvraag ontvangen!</h3>
+                <p className="success-sub">
+                  Arn stuurt je een WhatsApp bevestiging.
+                </p>
+                <button
+                  className="btn-primary"
+                  style={{ marginTop: 24 }}
+                  onClick={() => {
+                    setSuccess(false);
+                    slotsRef.current?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
+                  Nog een slot boeken
+                </button>
+              </div>
+            ) : (
+              <>
+                <h2 className="section-title section-title--light">Aanvraag indienen</h2>
+
+                <div className="summary-pills">
+                  {selectedSlotsData.map((slot) => (
+                    <span key={slot.id} className="selected-pill">
+                      <span className="selected-pill-dot" />
+                      {DAY_NL[new Date(slot.date).getDay()]}&nbsp;
+                      {new Date(slot.date).getDate()}&nbsp;
+                      {MONTH_NL[new Date(slot.date).getMonth()]}&nbsp;·&nbsp;
+                      {getTime(slot)}
+                    </span>
+                  ))}
+                </div>
+
+                {error && <div className="error-msg">{error}</div>}
+
+                <form onSubmit={handleSubmit} className="booking-form">
+                  <div className="field">
+                    <label className="field-label" htmlFor="name">Naam</label>
+                    <input
+                      id="name"
+                      type="text"
+                      required
+                      className="field-input"
+                      placeholder="Jouw naam"
+                      value={formData.name}
+                      onChange={(e) => setFormData((f) => ({ ...f, name: e.target.value }))}
+                    />
+                  </div>
+
+                  <div className="field">
+                    <label className="field-label" htmlFor="phone">Telefoon</label>
+                    <input
+                      id="phone"
+                      type="tel"
+                      required
+                      className="field-input"
+                      placeholder="06 12 34 56 78"
+                      value={formData.phone}
+                      onChange={(e) => setFormData((f) => ({ ...f, phone: e.target.value }))}
+                    />
+                  </div>
+
+                  <div className="field">
+                    <label className="field-label">Aantal spelers</label>
+                    <div className="players-grid">
+                      {[1, 2, 3, 4].map((n) => (
+                        <button
+                          key={n}
+                          type="button"
+                          className={`player-btn${formData.players === n ? " player-btn--active" : ""}`}
+                          onClick={() => setFormData((f) => ({ ...f, players: n }))}
+                        >
+                          {n}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="price-hint">
+                      €{price} per slot · Totaal:{" "}
+                      <strong style={{ color: "#00c27c" }}>€{totalPrice}</strong>
+                    </p>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="btn-primary btn-submit"
+                  >
+                    {submitting ? (
+                      <span className="spinner-row">
+                        <span className="spinner" />
+                        Versturen…
+                      </span>
+                    ) : (
+                      "Verstuur aanvraag 🎾"
+                    )}
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* ── FOOTER ── */}
       <footer className="site-footer">

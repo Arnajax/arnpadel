@@ -513,3 +513,173 @@ body {
 }
 
 .footer-link:hover { color: var(--green); }
+
+/* ────────────────────────────────────────
+   WEEK CALENDAR STRIP (Step 1)
+──────────────────────────────────────── */
+.cal-strip {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 4px 0 12px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.cal-strip::-webkit-scrollbar { display: none; }
+
+.cal-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  min-width: 58px;
+  height: 78px;
+  border-radius: 14px;
+  border: 2px solid transparent;
+  background: #f9fafb;
+  font-family: inherit;
+  padding: 8px 4px 14px;
+  position: relative;
+  transition: background 0.15s, border-color 0.15s, transform 0.12s;
+  flex-shrink: 0;
+}
+
+.cal-day--available {
+  background: #f0fdf7;
+  border-color: rgba(0, 194, 124, 0.25);
+  cursor: pointer;
+}
+.cal-day--available:hover {
+  border-color: var(--green);
+  transform: translateY(-2px);
+}
+
+.cal-day--disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.cal-day--active {
+  background: var(--green) !important;
+  border-color: var(--green) !important;
+}
+
+.cal-day--skeleton {
+  background: #f3f4f6;
+  animation: cal-pulse 1.4s ease-in-out infinite;
+  cursor: default;
+}
+
+@keyframes cal-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+.cal-day-abbr {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  transition: color 0.15s;
+}
+.cal-day--active .cal-day-abbr { color: rgba(255, 255, 255, 0.75); }
+
+.cal-day-num {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1;
+  transition: color 0.15s;
+}
+.cal-day--active .cal-day-num { color: #ffffff; }
+
+.cal-day-month {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: lowercase;
+  transition: color 0.15s;
+}
+.cal-day--active .cal-day-month { color: rgba(255, 255, 255, 0.7); }
+
+.cal-dot {
+  width: 5px;
+  height: 5px;
+  background: var(--green);
+  border-radius: 50%;
+  position: absolute;
+  bottom: 7px;
+  transition: background 0.15s;
+}
+.cal-day--active .cal-dot { background: rgba(255, 255, 255, 0.7); }
+
+/* ────────────────────────────────────────
+   TIME SLOT CHIPS (Step 2)
+──────────────────────────────────────── */
+.chips-section {
+  margin-top: 32px;
+}
+
+.chips-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: #f9fafb;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 10px 18px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s, background 0.15s, transform 0.12s;
+}
+.chip:hover {
+  border-color: var(--green);
+  transform: translateY(-1px);
+}
+.chip--active {
+  background: rgba(0, 194, 124, 0.1);
+  border-color: var(--green);
+}
+
+.chip-time {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--navy);
+  transition: color 0.15s;
+  line-height: 1;
+}
+.chip--active .chip-time { color: var(--green); }
+
+.chip-dur {
+  font-size: 0.62rem;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.slot-count {
+  margin: 14px 0 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--green);
+}
+
+/* ────────────────────────────────────────
+   SUMMARY PILLS (Step 3)
+──────────────────────────────────────── */
+.summary-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 28px;
+}
