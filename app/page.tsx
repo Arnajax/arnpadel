@@ -362,7 +362,7 @@ export default function Home() {
                 <CheckCircle />
                 <h3 className="success-title">Aanvraag verzonden! 🎾</h3>
                 <p className="success-sub">
-                  Arn neemt zo spoedig mogelijk contact op via WhatsApp.
+                  Je aanvraag is ontvangen. Arn neemt zo spoedig mogelijk contact op via WhatsApp.
                 </p>
                 <div className="success-card">
                   <div className="success-card-row">
