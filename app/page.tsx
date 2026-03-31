@@ -90,7 +90,7 @@ export default function Home() {
   useEffect(() => {
     fetch("/api/slots")
       .then((res) => res.json())
-      .then((data: Slot[]) => { setSlots(data); setLoading(false); })
+      .then((data: { slots?: Slot[] } | Slot[]) => { setSlots(Array.isArray(data) ? data : (data.slots ?? [])); setLoading(false); })
       .catch(() => { setSlots([]); setLoading(false); });
   }, []);
 
