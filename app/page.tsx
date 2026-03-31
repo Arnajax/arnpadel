@@ -16,13 +16,31 @@ interface FormData {
   players: number;
 }
 
-function formatDutchDate(dateStr: string): string {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("nl-NL", {
-    weekday: "short",
-    day: "numeric",
-    month: "short",
-  });
+const DAY_NL = ["ZO", "MA", "DI", "WO", "DO", "VR", "ZA"];
+const MONTH_NL = [
+  "jan", "feb", "mrt", "apr", "mei", "jun",
+  "jul", "aug", "sep", "okt", "nov", "dec",
+];
+
+function parseDate(dateStr: string): Date {
+  // handle both "2025-05-05" and "2025-05-05T10:00:00"
+  return new Date(dateStr);
+}
+
+function getDayAbbr(dateStr: string): string {
+  return DAY_NL[parseDate(dateStr).getDay()];
+}
+
+function getDayNum(dateStr: string): number {
+  return parseDate(dateStr).getDate();
+}
+
+function getMonthAbbr(dateStr: string): string {
+  return MONTH_NL[parseDate(dateStr).getMonth()];
+}
+
+function getTime(slot: Slot): string {
+  return slot.time ?? slot.date.split("T")[1]?.slice(0, 5) ?? "";
 }
 
 function getPrice(players: number): number {
@@ -31,12 +49,29 @@ function getPrice(players: number): number {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white rounded-2xl p-5 shadow-sm animate-pulse">
-      <div className="h-4 bg-gray-200 rounded w-2/3 mb-3" />
-      <div className="h-4 bg-gray-200 rounded w-1/2 mb-3" />
-      <div className="h-4 bg-gray-200 rounded w-1/3 mb-4" />
-      <div className="h-10 bg-gray-200 rounded-xl" />
+    <div className="slot-card animate-pulse">
+      <div style={{ height: 16, background: "#1a1a2e22", borderRadius: 6, width: "40%", marginBottom: 8 }} />
+      <div style={{ height: 36, background: "#1a1a2e22", borderRadius: 6, width: "60%", marginBottom: 8 }} />
+      <div style={{ height: 14, background: "#1a1a2e11", borderRadius: 6, width: "30%", marginBottom: 20 }} />
+      <div style={{ height: 42, background: "#00c27c33", borderRadius: 10 }} />
     </div>
+  );
+}
+
+function ChevronDown() {
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="6 9 12 15 18 9" />
+    </svg>
+  );
+}
+
+function CheckCircle() {
+  return (
+    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#00c27c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="12" cy="12" r="10" />
+      <polyline points="9 12 11 14 15 10" />
+    </svg>
   );
 }
 
@@ -44,11 +79,7 @@ export default function Home() {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
-  const [formData, setFormData] = useState<FormData>({
-    name: "",
-    phone: "",
-    players: 2,
-  });
+  const [formData, setFormData] = useState<FormData>({ name: "", phone: "", players: 2 });
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -57,43 +88,29 @@ export default function Home() {
   const formRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-    fetch(`${apiUrl}/slots`)
+    fetch("/api/slots")
       .then((res) => res.json())
-      .then((data: Slot[]) => {
-        setSlots(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setSlots([]);
-        setLoading(false);
-      });
+      .then((data: Slot[]) => { setSlots(data); setLoading(false); })
+      .catch(() => { setSlots([]); setLoading(false); });
   }, []);
 
   function handleSelectSlot(slot: Slot) {
     setSelectedSlot(slot);
-    formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  function getSlotLabel(slot: Slot): string {
-    const dateLabel = formatDutchDate(slot.date);
-    const time = slot.time ?? slot.date.split("T")[1]?.slice(0, 5) ?? "";
-    return `${dateLabel} om ${time} (${slot.duration} min)`;
+    setSuccess(false);
+    setError(null);
+    setTimeout(() => {
+      formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 50);
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!selectedSlot) {
-      setError("Selecteer eerst een slot hierboven.");
-      return;
-    }
+    if (!selectedSlot) { setError("Selecteer eerst een slot hierboven."); return; }
     setSubmitting(true);
     setError(null);
-    setSuccess(false);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-      const res = await fetch(`${apiUrl}/booking`, {
+      const res = await fetch("/api/booking", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -103,16 +120,13 @@ export default function Home() {
           slotId: selectedSlot.id,
         }),
       });
-
       if (!res.ok) {
         const errData = await res.json().catch(() => null);
         throw new Error(errData?.message ?? `Fout: ${res.status}`);
       }
-
       setSuccess(true);
       setFormData({ name: "", phone: "", players: 2 });
       setSelectedSlot(null);
-      slotsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Er is iets misgegaan.");
     } finally {
@@ -123,280 +137,216 @@ export default function Home() {
   const price = getPrice(formData.players);
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: "#F8F9FA" }}>
-      {/* Hero */}
-      <header
-        className="w-full py-16 px-4 text-center"
-        style={{
-          background: "linear-gradient(135deg, #00C27C 0%, #1A1A2E 100%)",
-        }}
-      >
-        <div className="max-w-2xl mx-auto">
-          <div className="text-6xl mb-4">🎾</div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-3 leading-tight tracking-tight">
-            Boek een padelles bij Arn
+    <div className="page-root">
+      {/* ── HERO ── */}
+      <section className="hero">
+        <div className="hero-glow" aria-hidden />
+        <div className="hero-inner">
+          <p className="hero-eyebrow">Privéles padel · Hoorn</p>
+          <h1 className="hero-title">
+            Verbeter je padel.<br />Nu boeken.
           </h1>
-          <p className="text-lg sm:text-xl font-medium" style={{ color: "#d4f5e9" }}>
-            Hoorn&nbsp;•&nbsp;Top-150 NL&nbsp;•&nbsp;Alle niveaus welkom
+          <p className="hero-sub">
+            Privéles met Arn Braunschweiger&nbsp;—&nbsp;Top-150 NL&nbsp;—&nbsp;Hoorn
           </p>
+          <div className="hero-stats">
+            <div className="stat">
+              <span className="stat-value">9+</span>
+              <span className="stat-label">jaar ervaring</span>
+            </div>
+            <div className="stat-divider" />
+            <div className="stat">
+              <span className="stat-value">Top-150</span>
+              <span className="stat-label">Nederland</span>
+            </div>
+            <div className="stat-divider" />
+            <div className="stat">
+              <span className="stat-value">Alle</span>
+              <span className="stat-label">niveaus</span>
+            </div>
+          </div>
         </div>
-      </header>
+        <button
+          className="hero-scroll"
+          onClick={() => slotsRef.current?.scrollIntoView({ behavior: "smooth" })}
+          aria-label="Scroll naar slots"
+        >
+          <ChevronDown />
+        </button>
+      </section>
 
-      <main className="max-w-4xl mx-auto px-4 py-10">
-        {/* Slot Overview */}
-        <section ref={slotsRef} className="mb-12">
-          <h2
-            className="text-2xl font-bold mb-6"
-            style={{ color: "#1A1A2E" }}
-          >
-            Beschikbare slots
-          </h2>
+      {/* ── SLOTS ── */}
+      <section className="slots-section" ref={slotsRef}>
+        <div className="section-inner">
+          <h2 className="section-title">Kies je moment</h2>
 
           {loading ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))}
+            <div className="slots-grid">
+              {Array.from({ length: 6 }).map((_, i) => <SkeletonCard key={i} />)}
             </div>
           ) : slots.length === 0 ? (
-            <div
-              className="rounded-2xl p-8 text-center text-base font-medium"
-              style={{ backgroundColor: "#e8f5e9", color: "#1A1A2E" }}
-            >
+            <div className="empty-state">
               Geen slots beschikbaar — volg{" "}
               <a
                 href="https://instagram.com/arnpadel"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline font-bold"
-                style={{ color: "#00C27C" }}
+                className="empty-link"
               >
                 @arnpadel
               </a>{" "}
               op Instagram voor updates.
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="slots-grid">
               {slots.map((slot) => {
                 const isSelected = selectedSlot?.id === slot.id;
-                const time =
-                  slot.time ?? slot.date.split("T")[1]?.slice(0, 5) ?? "";
+                const time = getTime(slot);
                 return (
                   <div
                     key={slot.id}
-                    className="bg-white rounded-2xl p-5 shadow-sm border-2 transition-all"
-                    style={{
-                      borderColor: isSelected ? "#00C27C" : "transparent",
-                      boxShadow: isSelected
-                        ? "0 0 0 2px #00C27C"
-                        : "0 1px 4px rgba(0,0,0,0.08)",
-                    }}
+                    className={`slot-card${isSelected ? " slot-card--selected" : ""}`}
                   >
-                    <div
-                      className="text-sm font-semibold uppercase tracking-wide mb-1"
-                      style={{ color: "#00C27C" }}
-                    >
-                      {formatDutchDate(slot.date)}
+                    <div className="slot-date">
+                      <span className="slot-day">{getDayAbbr(slot.date)}</span>
+                      <span className="slot-num">{getDayNum(slot.date)}</span>
+                      <span className="slot-month">{getMonthAbbr(slot.date)}</span>
                     </div>
-                    <div
-                      className="text-xl font-bold mb-1"
-                      style={{ color: "#1A1A2E" }}
-                    >
-                      {time}
+                    <div className="slot-time">{time}</div>
+                    <div className="slot-meta">
+                      <span className="slot-pill">{slot.duration} min</span>
                     </div>
-                    <div className="text-sm text-gray-500 mb-1">
-                      {slot.duration} min &middot; max {slot.maxPlayers} spelers
-                    </div>
-                    <div
-                      className="text-lg font-bold mb-4"
-                      style={{ color: "#1A1A2E" }}
-                    >
-                      Vanaf €80
-                    </div>
+                    <div className="slot-price">vanaf €80</div>
                     <button
+                      className={`slot-btn${isSelected ? " slot-btn--active" : ""}`}
                       onClick={() => handleSelectSlot(slot)}
-                      className="w-full py-2.5 rounded-xl text-sm font-bold text-white transition-opacity hover:opacity-90 active:scale-95"
-                      style={{
-                        backgroundColor: isSelected ? "#009e63" : "#00C27C",
-                      }}
                     >
-                      {isSelected ? "Geselecteerd ✓" : "Boek dit slot"}
+                      {isSelected ? "Geselecteerd ✓" : "Boek"}
                     </button>
                   </div>
                 );
               })}
             </div>
           )}
-        </section>
+        </div>
+      </section>
 
-        {/* Booking Form */}
-        <section
-          id="booking-form"
-          ref={formRef}
-          className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm"
-        >
-          <h2
-            className="text-2xl font-bold mb-6"
-            style={{ color: "#1A1A2E" }}
-          >
-            Aanvraag indienen
-          </h2>
-
-          {success && (
-            <div
-              className="rounded-xl p-4 mb-6 text-sm font-medium"
-              style={{ backgroundColor: "#d4f5e9", color: "#065f46" }}
-            >
-              Aanvraag ontvangen! Arn neemt snel contact op via WhatsApp ✅
-            </div>
-          )}
-
-          {error && (
-            <div
-              className="rounded-xl p-4 mb-6 text-sm font-medium"
-              style={{ backgroundColor: "#fee2e2", color: "#991b1b" }}
-            >
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Naam */}
-            <div>
-              <label
-                htmlFor="name"
-                className="block text-sm font-semibold mb-1"
-                style={{ color: "#1A1A2E" }}
-              >
-                Naam
-              </label>
-              <input
-                id="name"
-                type="text"
-                required
-                value={formData.name}
-                onChange={(e) =>
-                  setFormData((f) => ({ ...f, name: e.target.value }))
-                }
-                placeholder="Jouw naam"
-                className="w-full rounded-xl border px-4 py-3 text-sm outline-none transition-all focus:ring-2"
-                style={{
-                  borderColor: "#e5e7eb",
-                  color: "#1A1A2E",
-                }}
-                onFocus={(e) =>
-                  (e.target.style.borderColor = "#00C27C")
-                }
-                onBlur={(e) =>
-                  (e.target.style.borderColor = "#e5e7eb")
-                }
-              />
-            </div>
-
-            {/* Telefoon */}
-            <div>
-              <label
-                htmlFor="phone"
-                className="block text-sm font-semibold mb-1"
-                style={{ color: "#1A1A2E" }}
-              >
-                Telefoon
-              </label>
-              <input
-                id="phone"
-                type="tel"
-                required
-                value={formData.phone}
-                onChange={(e) =>
-                  setFormData((f) => ({ ...f, phone: e.target.value }))
-                }
-                placeholder="06 12 34 56 78"
-                className="w-full rounded-xl border px-4 py-3 text-sm outline-none transition-all focus:ring-2"
-                style={{
-                  borderColor: "#e5e7eb",
-                  color: "#1A1A2E",
-                }}
-                onFocus={(e) =>
-                  (e.target.style.borderColor = "#00C27C")
-                }
-                onBlur={(e) =>
-                  (e.target.style.borderColor = "#e5e7eb")
-                }
-              />
-            </div>
-
-            {/* Aantal spelers */}
-            <div>
-              <label
-                htmlFor="players"
-                className="block text-sm font-semibold mb-1"
-                style={{ color: "#1A1A2E" }}
-              >
-                Aantal spelers
-              </label>
-              <select
-                id="players"
-                value={formData.players}
-                onChange={(e) =>
-                  setFormData((f) => ({
-                    ...f,
-                    players: Number(e.target.value),
-                  }))
-                }
-                className="w-full rounded-xl border px-4 py-3 text-sm outline-none bg-white"
-                style={{ borderColor: "#e5e7eb", color: "#1A1A2E" }}
-              >
-                <option value={1}>1 speler — €80</option>
-                <option value={2}>2 spelers — €80</option>
-                <option value={3}>3 spelers — €90</option>
-                <option value={4}>4 spelers — €90</option>
-              </select>
-              <p className="text-xs mt-1" style={{ color: "#6b7280" }}>
-                Prijs voor dit slot:{" "}
-                <span className="font-bold" style={{ color: "#00C27C" }}>
-                  €{price}
-                </span>
+      {/* ── BOOKING FORM ── */}
+      <section className="form-section" ref={formRef}>
+        <div className="section-inner">
+          {success ? (
+            <div className="success-block">
+              <CheckCircle />
+              <h3 className="success-title">Aanvraag ontvangen!</h3>
+              <p className="success-sub">
+                Arn stuurt je een WhatsApp bevestiging.
               </p>
-            </div>
-
-            {/* Geselecteerd slot */}
-            <div>
-              <label
-                htmlFor="slot"
-                className="block text-sm font-semibold mb-1"
-                style={{ color: "#1A1A2E" }}
+              <button
+                className="btn-primary"
+                style={{ marginTop: 24 }}
+                onClick={() => { setSuccess(false); slotsRef.current?.scrollIntoView({ behavior: "smooth" }); }}
               >
-                Geselecteerd slot
-              </label>
-              <input
-                id="slot"
-                type="text"
-                readOnly
-                value={selectedSlot ? getSlotLabel(selectedSlot) : ""}
-                placeholder="Selecteer een slot hierboven"
-                className="w-full rounded-xl border px-4 py-3 text-sm bg-gray-50 cursor-default"
-                style={{ borderColor: "#e5e7eb", color: "#1A1A2E" }}
-              />
+                Nog een slot boeken
+              </button>
             </div>
+          ) : (
+            <>
+              <h2 className="section-title section-title--light">Aanvraag indienen</h2>
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full py-4 rounded-xl text-base font-bold text-white transition-opacity disabled:opacity-60 hover:opacity-90 active:scale-95"
-              style={{ backgroundColor: "#00C27C" }}
-            >
-              {submitting ? "Versturen…" : "Verstuur aanvraag 🎾"}
-            </button>
-          </form>
-        </section>
-      </main>
+              {selectedSlot && (
+                <div className="selected-pill">
+                  <span className="selected-pill-dot" />
+                  {getDayAbbr(selectedSlot.date)}&nbsp;{getDayNum(selectedSlot.date)}&nbsp;{getMonthAbbr(selectedSlot.date)}&nbsp;·&nbsp;{getTime(selectedSlot)}
+                </div>
+              )}
 
-      <footer
-        className="text-center py-8 text-sm"
-        style={{ color: "#9ca3af" }}
-      >
-        © {new Date().getFullYear()} arnpadel — Hoorn
+              {!selectedSlot && (
+                <p className="form-hint">
+                  Selecteer eerst een slot hierboven om verder te gaan.
+                </p>
+              )}
+
+              {error && (
+                <div className="error-msg">{error}</div>
+              )}
+
+              <form onSubmit={handleSubmit} className="booking-form">
+                <div className="field">
+                  <label className="field-label" htmlFor="name">Naam</label>
+                  <input
+                    id="name"
+                    type="text"
+                    required
+                    className="field-input"
+                    placeholder="Jouw naam"
+                    value={formData.name}
+                    onChange={(e) => setFormData((f) => ({ ...f, name: e.target.value }))}
+                  />
+                </div>
+
+                <div className="field">
+                  <label className="field-label" htmlFor="phone">Telefoon</label>
+                  <input
+                    id="phone"
+                    type="tel"
+                    required
+                    className="field-input"
+                    placeholder="06 12 34 56 78"
+                    value={formData.phone}
+                    onChange={(e) => setFormData((f) => ({ ...f, phone: e.target.value }))}
+                  />
+                </div>
+
+                <div className="field">
+                  <label className="field-label">Aantal spelers</label>
+                  <div className="players-grid">
+                    {[1, 2, 3, 4].map((n) => (
+                      <button
+                        key={n}
+                        type="button"
+                        className={`player-btn${formData.players === n ? " player-btn--active" : ""}`}
+                        onClick={() => setFormData((f) => ({ ...f, players: n }))}
+                      >
+                        {n}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="price-hint">
+                    Totaal: <strong style={{ color: "#00c27c" }}>€{price}</strong>
+                  </p>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={submitting || !selectedSlot}
+                  className="btn-primary btn-submit"
+                >
+                  {submitting ? (
+                    <span className="spinner-row">
+                      <span className="spinner" />
+                      Versturen…
+                    </span>
+                  ) : (
+                    "Verstuur aanvraag 🎾"
+                  )}
+                </button>
+              </form>
+            </>
+          )}
+        </div>
+      </section>
+
+      {/* ── FOOTER ── */}
+      <footer className="site-footer">
+        <span>© {new Date().getFullYear()} Arn Braunschweiger</span>
+        <span className="footer-dot">·</span>
+        <a href="https://instagram.com/arnpadel" target="_blank" rel="noopener noreferrer" className="footer-link">
+          Instagram
+        </a>
+        <span className="footer-dot">·</span>
+        <a href="https://wa.me/31612345678" target="_blank" rel="noopener noreferrer" className="footer-link">
+          WhatsApp
+        </a>
       </footer>
     </div>
   );
