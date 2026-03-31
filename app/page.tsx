@@ -87,7 +87,7 @@ export default function Home() {
   const [selectedSlotIds, setSelectedSlotIds] = useState<Set<string | number>>(new Set());
   const [formData, setFormData] = useState<FormData>({ name: "", phone: "", players: 2 });
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+  const [successData, setSuccessData] = useState<{ name: string; players: number; slots: Slot[]; total: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const slotsRef = useRef<HTMLDivElement>(null);
@@ -181,7 +181,16 @@ export default function Home() {
         const errData = await res.json().catch(() => null);
         throw new Error(errData?.message ?? `Fout: ${res.status}`);
       }
-      setSuccess(true);
+      const responseData = await res.json();
+      if (responseData.waUrl) {
+        window.open(responseData.waUrl, "_blank");
+      }
+      setSuccessData({
+        name: formData.name,
+        players: formData.players,
+        slots: selectedSlotsData,
+        total: getPrice(formData.players) * selectedSlotIds.size,
+      });
       setFormData({ name: "", phone: "", players: 2 });
       setSelectedSlotIds(new Set());
       setSelectedDate(null);
@@ -348,18 +357,45 @@ export default function Home() {
       {selectedSlotIds.size > 0 && (
         <section className="form-section" ref={formRef}>
           <div className="section-inner">
-            {success ? (
+            {successData ? (
               <div className="success-block">
                 <CheckCircle />
-                <h3 className="success-title">Aanvraag ontvangen!</h3>
+                <h3 className="success-title">Aanvraag verzonden! 🎾</h3>
                 <p className="success-sub">
-                  Arn stuurt je een WhatsApp bevestiging op +31 6 29 89 68 79.
+                  Arn neemt zo spoedig mogelijk contact op via WhatsApp.
                 </p>
+                <div className="success-card">
+                  <div className="success-card-row">
+                    <span className="success-card-label">Naam</span>
+                    <span className="success-card-value">{successData.name}</span>
+                  </div>
+                  <div className="success-card-row">
+                    <span className="success-card-label">Spelers</span>
+                    <span className="success-card-value">{successData.players}</span>
+                  </div>
+                  <div className="success-card-row">
+                    <span className="success-card-label">Slot{successData.slots.length > 1 ? "s" : ""}</span>
+                    <span className="success-card-value">
+                      {successData.slots.map((s) => (
+                        <span key={s.id} style={{ display: "block" }}>
+                          {DAY_NL[new Date(s.date).getDay()]}&nbsp;
+                          {new Date(s.date).getDate()}&nbsp;
+                          {MONTH_NL[new Date(s.date).getMonth()]}&nbsp;·&nbsp;
+                          {getTime(s)}
+                        </span>
+                      ))}
+                    </span>
+                  </div>
+                  <div className="success-card-row success-card-row--total">
+                    <span className="success-card-label">Totaal</span>
+                    <span className="success-card-total">€{successData.total}</span>
+                  </div>
+                </div>
                 <button
                   className="btn-primary"
                   style={{ marginTop: 24 }}
                   onClick={() => {
-                    setSuccess(false);
+                    setSuccessData(null);
                     slotsRef.current?.scrollIntoView({ behavior: "smooth" });
                   }}
                 >

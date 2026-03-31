@@ -510,7 +510,54 @@ body {
 .success-sub {
   color: #9ca3af;
   font-size: 1rem;
-  margin: 0;
+  margin: 0 0 24px;
+}
+
+.success-card {
+  width: 100%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.success-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 12px 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.success-card-row:last-child { border-bottom: none; }
+
+.success-card-row--total {
+  background: rgba(0, 194, 124, 0.08);
+}
+
+.success-card-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding-top: 1px;
+  white-space: nowrap;
+}
+
+.success-card-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e5e7eb;
+  text-align: right;
+}
+
+.success-card-total {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--green);
 }
 
 /* ────────────────────────────────────────
