@@ -10,7 +10,15 @@ export async function GET() {
     })
     clearTimeout(timeout)
     const data = await res.json()
-    return NextResponse.json(data)
+    const raw = Array.isArray(data) ? data : (data.slots ?? [])
+    const slots = raw.map((s: any) => ({
+      id: s.id,
+      date: s.datum,
+      time: s.tijd,
+      duration: s.duur,
+      maxPlayers: Number(s.max_spelers),
+    }))
+    return NextResponse.json({ slots })
   } catch (e) {
     return NextResponse.json({ error: String(e), slots: [] }, { status: 500 })
   }
