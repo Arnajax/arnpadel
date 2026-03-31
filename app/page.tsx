@@ -221,6 +221,9 @@ export default function Home() {
           <p className="hero-sub">
             Privéles met Arn Braunschweiger&nbsp;—&nbsp;Top-150 NL&nbsp;—&nbsp;Hoorn
           </p>
+          <p className="hero-location">
+            📍 Sportcentrum Hoorn — Binnenbanen
+          </p>
           <div className="hero-stats">
             <div className="stat">
               <span className="stat-value">9+</span>
@@ -283,22 +286,20 @@ export default function Home() {
               </button>
 
               <div className="cal-strip">
-                {weekDays.map((d) => {
+                {weekDays.filter((d) => hasSlotsForDate(toDateKey(d))).map((d) => {
                   const key = toDateKey(d);
-                  const available = hasSlotsForDate(key);
                   const isSelected = selectedDate === key;
                   return (
                     <button
                       key={key}
-                      className={`cal-day${available ? " cal-day--available" : " cal-day--disabled"}${isSelected ? " cal-day--active" : ""}`}
+                      className={`cal-day cal-day--available${isSelected ? " cal-day--active" : ""}`}
                       onClick={() => handleSelectDate(key)}
-                      disabled={!available}
                       aria-pressed={isSelected}
                     >
                       <span className="cal-day-abbr">{DAY_NL[d.getDay()]}</span>
                       <span className="cal-day-num">{d.getDate()}</span>
                       <span className="cal-day-month">{MONTH_NL[d.getMonth()]}</span>
-                      {available && <span className="cal-dot" />}
+                      <span className="cal-dot" />
                     </button>
                   );
                 })}
@@ -352,7 +353,7 @@ export default function Home() {
                 <CheckCircle />
                 <h3 className="success-title">Aanvraag ontvangen!</h3>
                 <p className="success-sub">
-                  Arn stuurt je een WhatsApp bevestiging.
+                  Arn stuurt je een WhatsApp bevestiging op +31 6 29 89 68 79.
                 </p>
                 <button
                   className="btn-primary"
@@ -459,7 +460,7 @@ export default function Home() {
           Instagram
         </a>
         <span className="footer-dot">·</span>
-        <a href="https://wa.me/31612345678" target="_blank" rel="noopener noreferrer" className="footer-link">
+        <a href="https://wa.me/31629896879" target="_blank" rel="noopener noreferrer" className="footer-link">
           WhatsApp
         </a>
       </footer>

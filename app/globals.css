@@ -98,7 +98,14 @@ body {
 .hero-sub {
   font-size: clamp(0.95rem, 2.5vw, 1.1rem);
   color: #9ca3af;
-  margin: 0 0 48px;
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+
+.hero-location {
+  font-size: 0.85rem;
+  color: #9ca3af;
+  margin: 0 0 40px;
   line-height: 1.5;
 }
 
@@ -187,6 +194,7 @@ body {
 .slots-section {
   background: var(--bg);
   padding: 80px 0;
+  text-align: center;
 }
 
 .slots-grid {
@@ -536,6 +544,7 @@ body {
 .cal-nav {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
 }
 
@@ -565,14 +574,12 @@ body {
 
 .cal-strip {
   display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
   gap: 8px;
-  overflow-x: auto;
   padding: 4px 0 12px;
-  flex: 1;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
 }
-.cal-strip::-webkit-scrollbar { display: none; }
+
 
 .cal-day {
   display: flex;
@@ -672,6 +679,7 @@ body {
 .chips-row {
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
   gap: 10px;
 }
 
