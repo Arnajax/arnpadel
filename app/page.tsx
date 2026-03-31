@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 interface Slot {
   id: string | number;
@@ -23,7 +23,31 @@ const MONTH_NL = [
 ];
 
 function toDateKey(d: Date): string {
-  return d.toISOString().slice(0, 10);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
+function parseDateLocal(dateKey: string): Date {
+  const [y, mo, d] = dateKey.split("-").map(Number);
+  return new Date(y, mo - 1, d);
+}
+
+function ChevronLeft() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="15 18 9 12 15 6" />
+    </svg>
+  );
+}
+
+function ChevronRight() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="9 18 15 12 9 6" />
+    </svg>
+  );
 }
 
 function slotDateKey(dateStr: string): string {
@@ -58,7 +82,7 @@ function CheckCircle() {
 export default function Home() {
   const [slots, setSlots] = useState<Slot[]>([]);
   const [loading, setLoading] = useState(true);
-  const [weekDays, setWeekDays] = useState<Date[]>([]);
+  const [weekOffset, setWeekOffset] = useState(0);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlotIds, setSelectedSlotIds] = useState<Set<string | number>>(new Set());
   const [formData, setFormData] = useState<FormData>({ name: "", phone: "", players: 2 });
@@ -69,18 +93,6 @@ export default function Home() {
   const slotsRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const prevSlotCount = useRef(0);
-
-  useEffect(() => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    setWeekDays(
-      Array.from({ length: 7 }, (_, i) => {
-        const d = new Date(today);
-        d.setDate(today.getDate() + i);
-        return d;
-      })
-    );
-  }, []);
 
   useEffect(() => {
     fetch("/api/slots")
@@ -100,6 +112,22 @@ export default function Home() {
     }
     prevSlotCount.current = selectedSlotIds.size;
   }, [selectedSlotIds.size]);
+
+  const firstSlotDate = useMemo(() => {
+    if (slots.length === 0) return null;
+    return slots.map((s) => slotDateKey(s.date)).sort()[0];
+  }, [slots]);
+
+  const weekDays = useMemo(() => {
+    if (!firstSlotDate) return [];
+    const base = parseDateLocal(firstSlotDate);
+    base.setDate(base.getDate() + weekOffset * 7);
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(base);
+      d.setDate(base.getDate() + i);
+      return d;
+    });
+  }, [firstSlotDate, weekOffset]);
 
   function hasSlotsForDate(dateKey: string): boolean {
     return slots.some((s) => slotDateKey(s.date) === dateKey);
@@ -233,26 +261,45 @@ export default function Home() {
               op Instagram voor updates.
             </div>
           ) : (
-            <div className="cal-strip">
-              {weekDays.map((d) => {
-                const key = toDateKey(d);
-                const available = hasSlotsForDate(key);
-                const isSelected = selectedDate === key;
-                return (
-                  <button
-                    key={key}
-                    className={`cal-day${available ? " cal-day--available" : " cal-day--disabled"}${isSelected ? " cal-day--active" : ""}`}
-                    onClick={() => handleSelectDate(key)}
-                    disabled={!available}
-                    aria-pressed={isSelected}
-                  >
-                    <span className="cal-day-abbr">{DAY_NL[d.getDay()]}</span>
-                    <span className="cal-day-num">{d.getDate()}</span>
-                    <span className="cal-day-month">{MONTH_NL[d.getMonth()]}</span>
-                    {available && <span className="cal-dot" />}
-                  </button>
-                );
-              })}
+            <div className="cal-nav">
+              <button
+                className="cal-arrow"
+                onClick={() => setWeekOffset((o) => o - 1)}
+                disabled={weekOffset === 0}
+                aria-label="Vorige week"
+              >
+                <ChevronLeft />
+              </button>
+
+              <div className="cal-strip">
+                {weekDays.map((d) => {
+                  const key = toDateKey(d);
+                  const available = hasSlotsForDate(key);
+                  const isSelected = selectedDate === key;
+                  return (
+                    <button
+                      key={key}
+                      className={`cal-day${available ? " cal-day--available" : " cal-day--disabled"}${isSelected ? " cal-day--active" : ""}`}
+                      onClick={() => handleSelectDate(key)}
+                      disabled={!available}
+                      aria-pressed={isSelected}
+                    >
+                      <span className="cal-day-abbr">{DAY_NL[d.getDay()]}</span>
+                      <span className="cal-day-num">{d.getDate()}</span>
+                      <span className="cal-day-month">{MONTH_NL[d.getMonth()]}</span>
+                      {available && <span className="cal-dot" />}
+                    </button>
+                  );
+                })}
+              </div>
+
+              <button
+                className="cal-arrow"
+                onClick={() => setWeekOffset((o) => o + 1)}
+                aria-label="Volgende week"
+              >
+                <ChevronRight />
+              </button>
             </div>
           )}
 
