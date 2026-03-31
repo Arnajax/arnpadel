@@ -201,6 +201,17 @@ export default function Home() {
     <div className="page-root">
       {/* ── HERO ── */}
       <section className="hero">
+        <video
+          className="hero-video"
+          autoPlay
+          muted
+          loop
+          playsInline
+        >
+          <source src="/hero.webm" type="video/webm" />
+          <source src="/hero.mp4" type="video/mp4" />
+        </video>
+        <div className="hero-overlay" aria-hidden />
         <div className="hero-glow" aria-hidden />
         <div className="hero-inner">
           <p className="hero-eyebrow">Privéles padel · Hoorn</p>
