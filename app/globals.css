@@ -621,31 +621,32 @@ body {
 
 .footer-link:hover { color: var(--green); }
 
-.footer-wa-btn {
+.wa-cta-section {
+  display: flex;
+  justify-content: center;
+  padding: 32px 24px;
+  background: #f9f7f4;
+}
+
+.wa-cta-btn {
   display: inline-block;
   background: #25D366;
   color: #ffffff;
   font-size: 1.1rem;
   font-weight: 700;
-  padding: 16px 32px;
+  padding: 16px 40px;
   border-radius: 50px;
   text-decoration: none;
   box-shadow: 0 4px 20px rgba(37, 211, 102, 0.4);
   transition: background 0.15s, box-shadow 0.15s, transform 0.12s;
+  max-width: 320px;
+  text-align: center;
 }
 
-.footer-wa-btn:hover {
+.wa-cta-btn:hover {
   background: #1ebe5a;
   box-shadow: 0 6px 28px rgba(37, 211, 102, 0.5);
   transform: translateY(-1px);
-}
-
-@media (max-width: 600px) {
-  .footer-wa-btn {
-    width: 100%;
-    text-align: center;
-    box-sizing: border-box;
-  }
 }
 
 /* ────────────────────────────────────────

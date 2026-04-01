@@ -183,9 +183,6 @@ export default function Home() {
         throw new Error(errData?.message ?? `Fout: ${res.status}`);
       }
       const responseData = await res.json();
-      if (responseData.waUrl) {
-        window.open(responseData.waUrl, "_blank");
-      }
       setSuccessData({
         name: formData.name,
         players: formData.players,
@@ -483,15 +480,19 @@ export default function Home() {
       {/* ── ABOUT ── */}
       <AboutSection />
 
+      {/* ── WHATSAPP CTA ── */}
+      <div className="wa-cta-section">
+        <a href="https://wa.me/31629896879" target="_blank" rel="noopener noreferrer" className="wa-cta-btn">
+          WhatsApp
+        </a>
+      </div>
+
       {/* ── FOOTER ── */}
       <footer className="site-footer">
         <div className="footer-inner">
           <p className="footer-copy">© {new Date().getFullYear()} Arn Braunschweiger</p>
           <div className="footer-links">
             <span>📍 Sportcentrum Hoorn</span>
-            <a href="https://wa.me/31629896879" target="_blank" rel="noopener noreferrer" className="footer-wa-btn">
-              WhatsApp
-            </a>
           </div>
         </div>
       </footer>

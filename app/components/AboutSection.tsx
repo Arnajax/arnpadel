@@ -52,6 +52,9 @@ export default function AboutSection() {
         .about-photo-wrap {
           flex-shrink: 0;
           width: 260px;
+          margin: 0 auto;
+          display: flex;
+          justify-content: center;
         }
         .about-photo {
           width: 100%;
