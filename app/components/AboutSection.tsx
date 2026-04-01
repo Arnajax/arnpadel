@@ -3,18 +3,15 @@ export default function AboutSection() {
     <section className="about-section">
       <div className="about-inner">
         <div className="about-photo-wrap">
-          <div className="about-photo-placeholder">
-            <img src="/arn-photo.jpg" alt="Arn Braunschweiger" className="about-photo" />
-          </div>
+          <img src="/arn-photo.jpg" alt="Arn Braunschweiger padeltrainer" className="about-photo" />
         </div>
         <div className="about-text">
           <p className="about-tagline">Top-150 Nederland · 6 jaar ervaring · Hoorn</p>
-          <h2 className="about-heading">Over Arn</h2>
+          <h2 className="about-heading">Over mij</h2>
           <p className="about-body">
-            Ik ben Arn Braunschweiger, padeltrainer in Hoorn en omgeving. Met 6 jaar
-            ervaring en een notering in de Nederlandse top-150 help ik spelers van alle
-            niveaus — van absolute beginners tot competitiespelers — hun spel naar een
-            hoger niveau tillen.
+            Ik ben Arn Braunschweiger, padeltrainer in Hoorn. Met 6 jaar ervaring en een
+            notering in de Nederlandse top-150 help ik spelers van alle niveaus, van absolute
+            beginners tot competitiespelers, hun spel naar een hoger niveau tillen.
           </p>
           <p className="about-body">
             Na mijn opleiding aan de Academie voor Lichamelijke Opvoeding heb ik ruime
@@ -55,16 +52,10 @@ export default function AboutSection() {
           flex-shrink: 0;
           width: 260px;
         }
-        .about-photo-placeholder {
+        .about-photo {
           width: 100%;
           aspect-ratio: 3 / 4;
           border-radius: 16px;
-          overflow: hidden;
-          background: #e0dbd4;
-        }
-        .about-photo {
-          width: 100%;
-          height: 100%;
           object-fit: cover;
           display: block;
         }
