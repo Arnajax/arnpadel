@@ -18,7 +18,6 @@ interface FormData {
 }
 
 const DAY_FULL_NL  = ["Zondag","Maandag","Dinsdag","Woensdag","Donderdag","Vrijdag","Zaterdag"];
-const DAY_SHORT_NL = ["Zo","Ma","Di","Wo","Do","Vr","Za"];
 const CAL_HEADERS  = ["Ma","Di","Wo","Do","Vr","Za","Zo"];
 const MONTH_LONG_NL  = ["Januari","Februari","Maart","April","Mei","Juni","Juli","Augustus","September","Oktober","November","December"];
 const MONTH_SHORT_NL = ["jan","feb","mrt","apr","mei","jun","jul","aug","sep","okt","nov","dec"];
@@ -118,9 +117,6 @@ export default function Home() {
     }
     return map;
   }, [slots]);
-
-  // All unique slot dates for mobile strip
-  const slotDates = useMemo(() => Array.from(slotsByDate.keys()).sort(), [slotsByDate]);
 
   // Calendar cells for current view month (nulls = padding)
   const calCells = useMemo(() => {
@@ -312,30 +308,6 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Mobile horizontal strip */}
-                {slotDates.length > 0 && (
-                  <p className="bk-strip-month">
-                    {MONTH_LONG_NL[parseDateLocal(slotDates[0]).getMonth()]}{" "}
-                    {parseDateLocal(slotDates[0]).getFullYear()}
-                  </p>
-                )}
-                <div className="bk-strip-mobile">
-                  {slotDates.map(key => {
-                    const d   = parseDateLocal(key);
-                    const sel = selectedDate === key;
-                    return (
-                      <button
-                        key={key}
-                        onClick={() => handleSelectDate(key)}
-                        className={`bk-strip-day${sel ? " bk-strip-day--sel" : ""}`}
-                      >
-                        <span className="bk-strip-abbr">{DAY_SHORT_NL[d.getDay()]}</span>
-                        <span className="bk-strip-num">{d.getDate()}</span>
-                        <span className="bk-strip-dot"/>
-                      </button>
-                    );
-                  })}
-                </div>
               </div>
 
               {/* ── RIGHT / BELOW: Slots + Form ── */}
@@ -374,7 +346,7 @@ export default function Home() {
                           <div className="field">
                             <label className="field-label">Aantal spelers</label>
                             <div className="players-grid">
-                              {[1,2,3].map(n => (
+                              {[1,2,3,4].map(n => (
                                 <button
                                   key={n} type="button"
                                   className={`player-btn${playersSelected && formData.players === n ? " player-btn--active" : ""}`}

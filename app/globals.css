@@ -238,10 +238,8 @@ body {
   padding: 24px 20px;
 }
 
-/* Desktop calendar — hidden on mobile */
+/* Calendar always visible */
 .bk-cal-desktop { display: block; }
-.bk-strip-mobile { display: none; }
-.bk-strip-month  { display: none; }
 
 .bk-cal-nav {
   display: flex;
@@ -326,14 +324,10 @@ body {
 }
 .bk-cell--sel .bk-cell-dot { background: rgba(255,255,255,0.7); }
 
-/* ── Mobile strip — hidden on desktop ── */
+/* ── Mobile: full-width calendar, stacked layout ── */
 @media (max-width: 767px) {
-  .bk-layout         { flex-direction: column; border-radius: 12px; }
-  .bk-cal-col        { width: 100%; border-right: none; border-bottom: 1px solid #e5e7eb; padding: 16px; }
-  .bk-cal-desktop    { display: none; }
-  .bk-strip-month    { display: block; font-size: 15px; font-weight: 500; color: var(--navy); padding: 16px 16px 8px 16px; margin: 0; }
-  .bk-strip-mobile   { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; scrollbar-width: none; }
-  .bk-strip-mobile::-webkit-scrollbar { display: none; }
+  .bk-layout  { flex-direction: column; border-radius: 12px; }
+  .bk-cal-col { width: 100%; border-right: none; border-bottom: 1px solid #e5e7eb; padding: 16px 12px; }
 }
 
 .bk-strip-day {
@@ -479,7 +473,8 @@ body {
 .player-btn   { background: #f9fafb; border: 1.5px solid #e5e7eb; border-radius: 10px; color: #6b7280; font-size: 1rem; font-weight: 700; padding: 12px 0; cursor: pointer; transition: all 0.15s; font-family: inherit; }
 .player-btn:hover         { border-color: #16a34a; color: #16a34a; }
 .player-btn--active       { background: #f0fdf4; border-color: #16a34a; color: #16a34a; }
-.price-hint               { font-size: 0.88rem; color: #6b7280; margin: 4px 0 0; }
+.price-hint               { font-size: 0.88rem; color: #6b7280; margin: 8px 0 0; }
+.price-hint strong        { font-size: 22px; font-weight: 500; color: #16a34a; }
 
 .btn-confirm {
   width: 100%;
