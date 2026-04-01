@@ -219,7 +219,7 @@ export default function Home() {
       {/* ── BOOKING ── */}
       <section className="bk-section" ref={slotsRef}>
         <div className="bk-inner">
-          <h2 className="section-title">Kies je moment</h2>
+          <h2 className="section-title" style={{ textAlign:"center" }}>Boek hier je les</h2>
 
           {loading ? (
             <div className="bk-skeleton">
