@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server'
 
 export async function GET(
   _req: Request,
-  { params }: { params: { slot_id: string } }
+  { params }: { params: Promise<{ slot_id: string }> }
 ) {
-  const { slot_id } = params
+  const { slot_id } = await params
   const vpsRes = await fetch(`http://89.167.75.216:5077/ical/${slot_id}`)
 
   if (!vpsRes.ok) {
