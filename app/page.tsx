@@ -73,6 +73,7 @@ export default function Home() {
   const [viewYear, setViewYear]     = useState(new Date().getFullYear());
   const [viewMonth, setViewMonth]   = useState(new Date().getMonth());
   const [formData, setFormData]     = useState<FormData>({ name: "", phone: "", players: 2 });
+  const [playersSelected, setPlayersSelected] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<{ name: string; players: number; slot: Slot; total: number } | null>(null);
   const [error, setError]           = useState<string | null>(null);
@@ -147,6 +148,7 @@ export default function Home() {
   }
   function handleSelectSlot(id: string | number) {
     setSelectedSlotId(id);
+    setPlayersSelected(false);
     setError(null);
   }
 
@@ -173,6 +175,7 @@ export default function Home() {
       const slot = slots.find(s => s.id === selectedSlotId)!;
       setSuccessData({ name: formData.name, players: formData.players, slot, total: getPrice(formData.players) });
       setFormData({ name: "", phone: "", players: 2 });
+      setPlayersSelected(false);
       setSelectedSlotId(null);
       setSelectedDate(null);
     } catch (err: unknown) {
@@ -310,6 +313,12 @@ export default function Home() {
                 </div>
 
                 {/* Mobile horizontal strip */}
+                {slotDates.length > 0 && (
+                  <p className="bk-strip-month">
+                    {MONTH_LONG_NL[parseDateLocal(slotDates[0]).getMonth()]}{" "}
+                    {parseDateLocal(slotDates[0]).getFullYear()}
+                  </p>
+                )}
                 <div className="bk-strip-mobile">
                   {slotDates.map(key => {
                     const d   = parseDateLocal(key);
@@ -352,7 +361,7 @@ export default function Home() {
                             className={`bk-slot-row${active ? " bk-slot-row--active" : ""}`}
                           >
                             <span className="bk-slot-time">{getTime(slot)}</span>
-                            <span className="bk-slot-meta">{slot.duration} min · €{getPrice(formData.players)}</span>
+                            <span className="bk-slot-meta">{slot.duration} min</span>
                           </button>
                         );
                       })}
@@ -362,6 +371,26 @@ export default function Home() {
                       <div className="bk-form-wrap" ref={formRef}>
                         {error && <div className="error-msg">{error}</div>}
                         <form onSubmit={handleSubmit} className="bk-form">
+                          <div className="field">
+                            <label className="field-label">Aantal spelers</label>
+                            <div className="players-grid">
+                              {[1,2,3].map(n => (
+                                <button
+                                  key={n} type="button"
+                                  className={`player-btn${playersSelected && formData.players === n ? " player-btn--active" : ""}`}
+                                  onClick={() => {
+                                    setFormData(f => ({ ...f, players: n }));
+                                    setPlayersSelected(true);
+                                  }}
+                                >{n}</button>
+                              ))}
+                            </div>
+                            {playersSelected && (
+                              <p className="price-hint">
+                                Prijs: <strong style={{ color:"#16a34a" }}>€{getPrice(formData.players)}</strong>
+                              </p>
+                            )}
+                          </div>
                           <div className="field">
                             <label className="field-label" htmlFor="bk-name">Naam</label>
                             <input
@@ -379,21 +408,6 @@ export default function Home() {
                               value={formData.phone}
                               onChange={e => setFormData(f => ({ ...f, phone: e.target.value }))}
                             />
-                          </div>
-                          <div className="field">
-                            <label className="field-label">Aantal spelers</label>
-                            <div className="players-grid">
-                              {[1,2,3,4].map(n => (
-                                <button
-                                  key={n} type="button"
-                                  className={`player-btn${formData.players === n ? " player-btn--active" : ""}`}
-                                  onClick={() => setFormData(f => ({ ...f, players: n }))}
-                                >{n}</button>
-                              ))}
-                            </div>
-                            <p className="price-hint">
-                              Totaal: <strong style={{ color:"#16a34a" }}>€{price}</strong>
-                            </p>
                           </div>
                           <button type="submit" disabled={submitting} className="btn-confirm">
                             {submitting

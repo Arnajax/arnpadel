@@ -241,6 +241,7 @@ body {
 /* Desktop calendar — hidden on mobile */
 .bk-cal-desktop { display: block; }
 .bk-strip-mobile { display: none; }
+.bk-strip-month  { display: none; }
 
 .bk-cal-nav {
   display: flex;
@@ -330,6 +331,7 @@ body {
   .bk-layout         { flex-direction: column; border-radius: 12px; }
   .bk-cal-col        { width: 100%; border-right: none; border-bottom: 1px solid #e5e7eb; padding: 16px; }
   .bk-cal-desktop    { display: none; }
+  .bk-strip-month    { display: block; font-size: 15px; font-weight: 500; color: var(--navy); padding: 16px 16px 8px 16px; margin: 0; }
   .bk-strip-mobile   { display: flex; gap: 8px; overflow-x: auto; padding: 4px 0; scrollbar-width: none; }
   .bk-strip-mobile::-webkit-scrollbar { display: none; }
 }
