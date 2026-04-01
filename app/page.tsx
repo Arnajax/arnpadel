@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useMemo } from "react";
+import AboutSection from "./components/AboutSection";
 
 interface Slot {
   id: string | number;
@@ -478,6 +479,9 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* ── ABOUT ── */}
+      <AboutSection />
 
       {/* ── FOOTER ── */}
       <footer className="site-footer">
