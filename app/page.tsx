@@ -223,32 +223,23 @@ export default function Home() {
         <div className="hero-overlay" aria-hidden />
         <div className="hero-glow" aria-hidden />
         <div className="hero-inner">
-          <p className="hero-eyebrow">Privéles padel · Hoorn</p>
+          <div className="hero-badge">
+            <span className="hero-badge-dot" />
+            Top-150 NL · Hoorn
+          </div>
           <h1 className="hero-title">
-            Verbeter je padel.<br />Nu boeken.
+            Niet meer verliezen<br />van je vrienden.
           </h1>
           <p className="hero-sub">
-            Privéles met Arn Braunschweiger&nbsp;—&nbsp;Top-150 NL&nbsp;—&nbsp;Hoorn
+            Van potjes naar finales. Privé padelles in Hoorn met Arn Braunschweiger.
           </p>
-          <p className="hero-location">
-            📍 Sportcentrum Hoorn — Binnenbanen
-          </p>
-          <div className="hero-stats">
-            <div className="stat">
-              <span className="stat-value">6+</span>
-              <span className="stat-label">jaar ervaring</span>
-            </div>
-            <div className="stat-divider" />
-            <div className="stat">
-              <span className="stat-value">Top-150</span>
-              <span className="stat-label">Nederland</span>
-            </div>
-            <div className="stat-divider" />
-            <div className="stat">
-              <span className="stat-value">Alle</span>
-              <span className="stat-label">niveaus</span>
-            </div>
-          </div>
+          <button
+            className="hero-cta"
+            onClick={() => slotsRef.current?.scrollIntoView({ behavior: "smooth" })}
+          >
+            Boek je eerste training →
+          </button>
+          <p className="hero-proof">Geen abonnement · Gewoon één les boeken</p>
         </div>
         <button
           className="hero-scroll"
