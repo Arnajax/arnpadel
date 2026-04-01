@@ -40,6 +40,7 @@ export default function AboutSection() {
           background: #f9f7f4;
           border-top: 1px solid #ece9e4;
           padding: 80px 20px;
+          text-align: center;
         }
         .about-inner {
           max-width: 900px;
@@ -90,6 +91,7 @@ export default function AboutSection() {
           margin-top: 32px;
           border-top: 1px solid #ece9e4;
           padding-top: 24px;
+          justify-content: center;
         }
         .about-stat {
           flex: 1;

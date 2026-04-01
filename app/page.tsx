@@ -489,7 +489,7 @@ export default function Home() {
           <p className="footer-copy">© {new Date().getFullYear()} Arn Braunschweiger</p>
           <div className="footer-links">
             <span>📍 Sportcentrum Hoorn</span>
-            <a href="https://wa.me/31629896879" target="_blank" rel="noopener noreferrer" className="footer-link">
+            <a href="https://wa.me/31629896879" target="_blank" rel="noopener noreferrer" className="footer-wa-btn">
               WhatsApp
             </a>
           </div>
