@@ -235,7 +235,7 @@ export default function Home() {
           </p>
           <div className="hero-stats">
             <div className="stat">
-              <span className="stat-value">9+</span>
+              <span className="stat-value">6+</span>
               <span className="stat-label">jaar ervaring</span>
             </div>
             <div className="stat-divider" />
@@ -490,15 +490,15 @@ export default function Home() {
 
       {/* ── FOOTER ── */}
       <footer className="site-footer">
-        <span>© {new Date().getFullYear()} Arn Braunschweiger</span>
-        <span className="footer-dot">·</span>
-        <a href="https://instagram.com/arnpadel" target="_blank" rel="noopener noreferrer" className="footer-link">
-          Instagram
-        </a>
-        <span className="footer-dot">·</span>
-        <a href="https://wa.me/31629896879" target="_blank" rel="noopener noreferrer" className="footer-link">
-          WhatsApp
-        </a>
+        <div className="footer-inner">
+          <p className="footer-copy">© {new Date().getFullYear()} Arn Braunschweiger</p>
+          <div className="footer-links">
+            <span>📍 Sportcentrum Hoorn</span>
+            <a href="https://wa.me/31629896879" target="_blank" rel="noopener noreferrer" className="footer-link">
+              WhatsApp
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );
