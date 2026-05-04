@@ -1,5 +1,13 @@
 import { NextResponse } from 'next/server'
 
+interface VpsSlot {
+  id: string | number
+  datum: string
+  tijd: string
+  duur: number
+  max_spelers: number | string
+}
+
 export async function GET() {
   try {
     const controller = new AbortController()
@@ -10,8 +18,8 @@ export async function GET() {
     })
     clearTimeout(timeout)
     const data = await res.json()
-    const raw = Array.isArray(data) ? data : (data.slots ?? [])
-    const slots = raw.map((s: any) => ({
+    const raw: VpsSlot[] = Array.isArray(data) ? data : (data.slots ?? [])
+    const slots = raw.map((s) => ({
       id: s.id,
       date: s.datum,
       time: s.tijd,
