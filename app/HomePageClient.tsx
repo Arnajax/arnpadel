@@ -347,11 +347,7 @@ export default function HomePageClient({
           <a href="#rackettest" className="site-nav-link">Rackets testen</a>
         </div>
         <div className="site-nav-center">
-          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" className="site-nav-ball">
-            <circle cx="7" cy="7" r="6" fill="var(--green)"/>
-            <path d="M1.5 7 Q7 2 12.5 7 M1.5 7 Q7 12 12.5 7" stroke="rgba(255,255,255,0.6)" strokeWidth="0.8" fill="none"/>
-          </svg>
-          <span className="site-nav-logo">Padel Hub Hoorn</span>
+          <img src="/phh-logo-horizontal.svg" alt="Padel Hub Hoorn" className="site-nav-logo-img" />
         </div>
         <div className="site-nav-right">
           <button className="site-nav-cta" onClick={() => bookingRef.current?.scrollIntoView({ behavior: "smooth" })}>

@@ -81,16 +81,11 @@ body {
   justify-self: center;
 }
 
-.site-nav-ball {
-  flex-shrink: 0;
-}
-
-.site-nav-logo {
-  font-size: 0.78rem;
-  font-weight: 700;
-  color: rgba(255, 255, 255, 0.9);
-  text-transform: uppercase;
-  letter-spacing: 0.14em;
+.site-nav-logo-img {
+  display: block;
+  height: 18px;
+  width: auto;
+  max-width: none;
 }
 
 .site-nav-right {
@@ -119,13 +114,16 @@ body {
 }
 
 @media (max-width: 640px) {
+  .site-nav {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
   .site-nav-left,
   .site-nav-right {
     display: none;
   }
-  .site-nav {
-    grid-template-columns: 1fr;
-    justify-items: center;
+  .site-nav-center {
+    justify-self: center;
   }
 }
 
