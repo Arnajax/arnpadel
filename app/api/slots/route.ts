@@ -1,32 +1,17 @@
 import { NextResponse } from 'next/server'
-
-interface VpsSlot {
-  id: string | number
-  datum: string
-  tijd: string
-  duur: number
-  max_spelers: number | string
-}
+import { fetchSlots } from '../../_lib/slots'
 
 export async function GET() {
   try {
-    const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 10000)
-    const res = await fetch('http://89.167.75.216:5077/slots', {
-      cache: 'no-store',
-      signal: controller.signal,
-    })
-    clearTimeout(timeout)
-    const data = await res.json()
-    const raw: VpsSlot[] = Array.isArray(data) ? data : (data.slots ?? [])
-    const slots = raw.map((s) => ({
-      id: s.id,
-      date: s.datum,
-      time: s.tijd,
-      duration: s.duur,
-      maxPlayers: Number(s.max_spelers),
-    }))
-    return NextResponse.json({ slots })
+    const slots = await fetchSlots()
+    return NextResponse.json(
+      { slots },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=30',
+        },
+      }
+    )
   } catch (e) {
     return NextResponse.json({ error: String(e), slots: [] }, { status: 500 })
   }
