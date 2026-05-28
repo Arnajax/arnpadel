@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
-import AutoLaunch from "./AutoLaunch";
 import { classifyCalendarClient, fetchCalendarBooking } from "../_lib/calendar";
 
 export const dynamic = "force-dynamic";
@@ -20,13 +19,13 @@ export default async function CalendarLandingPage({
 
   const userAgent = (await headers()).get("user-agent") ?? "";
   const clientType = classifyCalendarClient(userAgent);
+  const googleHref = booking.booking.googleUrl;
 
   if (clientType === "google") {
-    redirect(`/a/${token}/google`);
+    redirect(googleHref);
   }
 
   const icsHref = `/a/${token}/ics`;
-  const googleHref = `/a/${token}/google`;
 
   return (
     <main
@@ -39,7 +38,6 @@ export default async function CalendarLandingPage({
         fontFamily: "var(--font-inter), sans-serif",
       }}
     >
-      <AutoLaunch href={icsHref} />
       <section
         style={{
           maxWidth: 560,
@@ -65,7 +63,7 @@ export default async function CalendarLandingPage({
             letterSpacing: "0.02em",
           }}
         >
-          ArnPadel
+          Padel Hub Hoorn
         </div>
 
         <h1
@@ -86,8 +84,7 @@ export default async function CalendarLandingPage({
             margin: 0,
           }}
         >
-          We openen alvast de agenda-import voor je. Werkt dat niet meteen, kies
-          dan hieronder je gewenste optie.
+          Kies hieronder hoe je deze les aan je agenda wilt toevoegen.
         </p>
 
         <div
@@ -141,8 +138,10 @@ export default async function CalendarLandingPage({
           >
             Open in Apple Agenda / Outlook
           </Link>
-          <Link
+          <a
             href={googleHref}
+            target="_blank"
+            rel="noopener noreferrer"
             style={{
               display: "block",
               textAlign: "center",
@@ -157,7 +156,7 @@ export default async function CalendarLandingPage({
             }}
           >
             Open in Google Calendar
-          </Link>
+          </a>
         </div>
 
         <p

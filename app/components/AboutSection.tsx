@@ -1,37 +1,43 @@
+import { TRAINERS } from "../_lib/trainers";
+
 export default function AboutSection() {
   return (
     <section className="about-section">
-      <div className="about-inner">
-        <div className="about-photo-wrap">
-          <img src="/arn-photo.jpg" alt="Arn Braunschweiger padeltrainer" className="about-photo" />
-        </div>
-        <div className="about-text">
-          <p className="about-tagline">Top-150 Nederland · 6 jaar ervaring · Hoorn</p>
-          <h2 className="about-heading">Over mij</h2>
-          <p className="about-body">
-            Ik ben Arn Braunschweiger, padeltrainer in Hoorn. Met 6 jaar ervaring en een
-            notering in de Nederlandse top-150 help ik spelers van alle niveaus, van absolute
-            beginners tot competitiespelers, hun spel naar een hoger niveau tillen.
-          </p>
-          <p className="about-body">
-            Na mijn opleiding aan de Academie voor Lichamelijke Opvoeding heb ik ruime
-            ervaring opgebouwd als trainer en instructeur. Mijn lessen zijn persoonlijk,
-            to-the-point en altijd afgestemd op jouw niveau en doelen.
-          </p>
-          <div className="about-stats">
-            <div className="about-stat">
-              <span className="about-stat-value">Top 150</span>
-              <span className="about-stat-label">Nederland ranking</span>
+      <div className="about-section-inner">
+        <h2 className="about-heading-main">Onze trainers</h2>
+        <p className="about-subline">Persoonlijk, to-the-point en altijd afgestemd op jouw niveau.</p>
+        <div className="about-trainers-grid">
+          {TRAINERS.map((trainer) => (
+            <div key={trainer.id} className="about-trainer-card">
+              <div className="about-photo-wrap">
+                <img
+                  src={trainer.photoSrc}
+                  alt={trainer.name}
+                  className="about-photo"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/arn-photo.jpg";
+                  }}
+                />
+              </div>
+              <div className="about-text">
+                <p className="about-tagline">{trainer.role}</p>
+                <h3 className="about-trainer-name">{trainer.name}</h3>
+                {trainer.bio.map((para, i) => (
+                  <p key={i} className="about-body">{para}</p>
+                ))}
+                {trainer.stats.length > 0 && (
+                  <div className="about-stats">
+                    {trainer.stats.map((stat) => (
+                      <div key={stat.label} className="about-stat">
+                        <span className="about-stat-label">{stat.label}</span>
+                        <span className="about-stat-value">{stat.value}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
-            <div className="about-stat">
-              <span className="about-stat-value">6 jaar</span>
-              <span className="about-stat-label">Ervaring</span>
-            </div>
-            <div className="about-stat">
-              <span className="about-stat-value">ALO</span>
-              <span className="about-stat-label">Opgeleid</span>
-            </div>
-          </div>
+          ))}
         </div>
       </div>
 
@@ -40,27 +46,48 @@ export default function AboutSection() {
           background: #f9f7f4;
           border-top: 1px solid #ece9e4;
           padding: 80px 20px;
+        }
+        .about-section-inner {
+          max-width: 960px;
+          margin: 0 auto;
+        }
+        .about-heading-main {
+          font-size: clamp(1.8rem, 4vw, 2.4rem);
+          font-weight: 800;
+          color: #1a1a2e;
+          margin: 0 0 8px;
+          letter-spacing: -0.01em;
           text-align: center;
         }
-        .about-inner {
-          max-width: 900px;
-          margin: 0 auto;
+        .about-subline {
+          text-align: center;
+          color: #6b7280;
+          font-size: 0.97rem;
+          margin: 0 0 48px;
+        }
+        .about-trainers-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 56px;
+        }
+        .about-trainer-card {
           display: flex;
           gap: 56px;
           align-items: flex-start;
         }
+        .about-trainer-card:nth-child(even) {
+          flex-direction: row-reverse;
+        }
         .about-photo-wrap {
           flex-shrink: 0;
-          width: 260px;
-          margin: 0 auto;
-          display: flex;
-          justify-content: center;
+          width: 240px;
         }
         .about-photo {
           width: 100%;
           aspect-ratio: 3 / 4;
           border-radius: 16px;
           object-fit: cover;
+          object-position: top center;
           display: block;
         }
         .about-text {
@@ -73,28 +100,27 @@ export default function AboutSection() {
           color: #00a869;
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          margin: 0 0 12px;
+          margin: 0 0 8px;
         }
-        .about-heading {
-          font-size: clamp(1.8rem, 4vw, 2.4rem);
+        .about-trainer-name {
+          font-size: clamp(1.5rem, 3vw, 2rem);
           font-weight: 800;
           color: #1a1a2e;
-          margin: 0 0 20px;
+          margin: 0 0 16px;
           letter-spacing: -0.01em;
         }
         .about-body {
           font-size: 0.97rem;
           line-height: 1.7;
           color: #4b5563;
-          margin: 0 0 16px;
+          margin: 0 0 12px;
         }
         .about-stats {
           display: flex;
           gap: 0;
-          margin-top: 32px;
+          margin-top: 28px;
           border-top: 1px solid #ece9e4;
-          padding-top: 24px;
-          justify-content: center;
+          padding-top: 20px;
         }
         .about-stat {
           flex: 1;
@@ -127,13 +153,22 @@ export default function AboutSection() {
         }
 
         @media (max-width: 680px) {
-          .about-inner {
+          .about-trainer-card,
+          .about-trainer-card:nth-child(even) {
             flex-direction: column;
-            gap: 32px;
+            align-items: center;
+            gap: 24px;
           }
           .about-photo-wrap {
             width: 100%;
-            max-width: 200px;
+            max-width: 180px;
+            margin: 0 auto;
+          }
+          .about-text {
+            text-align: center;
+          }
+          .about-stats {
+            justify-content: center;
           }
         }
       `}</style>

@@ -40,3 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+
+# local scratch / VPS scripts (not part of the frontend)
+/padel-booking/
+/test-results/
+/e2e/
