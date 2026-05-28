@@ -362,7 +362,7 @@ export default function HomePageClient({
 
       {/* ── HERO ── */}
       <section className="hero">
-        <video className="hero-video" autoPlay muted loop playsInline>
+        <video className="hero-video" autoPlay muted loop playsInline preload="metadata" poster="/hero-poster.jpg">
           <source src="/hero.webm" type="video/webm"/>
           <source src="/hero.mp4"  type="video/mp4"/>
         </video>

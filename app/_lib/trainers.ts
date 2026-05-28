@@ -65,7 +65,7 @@ export const TRAINERS: Trainer[] = [
       { label: "Ervaring", value: "5 jaar" },
       { label: "Opleiding", value: "ALO" },
     ],
-    photoSrc: "/floris-photo.png",
+    photoSrc: "/floris-photo.jpg",
     cta: "Binnenkort beschikbaar",
   },
 ];
