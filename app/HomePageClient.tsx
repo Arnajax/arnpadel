@@ -41,14 +41,18 @@ function parseDateLocal(key: string): Date {
 }
 function slotDateKey(s: string): string { return s.slice(0,10); }
 function getTime(slot: Slot): string { return slot.time ?? slot.date.split("T")[1]?.slice(0,5) ?? ""; }
-function isAvondSlot(time: string): boolean {
+function isPiekSlot(time: string, dateStr?: string): boolean {
+  if (dateStr) {
+    const wd = parseDateLocal(slotDateKey(dateStr)).getDay(); // 0=zo, 6=za
+    if (wd === 0 || wd === 6) return true;                     // heel weekend = piek
+  }
   const hour = parseInt(time.split(":")[0], 10);
-  return !isNaN(hour) && hour >= 17;
+  return !isNaN(hour) && hour >= 17;                           // doordeweeks vanaf 17:00 = piek
 }
-function getBaanhuur(time: string): number { return isAvondSlot(time) ? 30 : 20; }
-function getPrice(players: number, time: string): number {
+function getBaanhuur(time: string, dateStr?: string): number { return isPiekSlot(time, dateStr) ? 30 : 20; }
+function getPrice(players: number, time: string, dateStr?: string): number {
   const lesprijs = players <= 2 ? 60 : 70;
-  return lesprijs + getBaanhuur(time);
+  return lesprijs + getBaanhuur(time, dateStr);
 }
 function monOffset(d: Date): number { return (d.getDay()+6)%7; }
 
@@ -212,7 +216,7 @@ export default function HomePageClient({
   }, [selectedSlotIds, slotById]);
 
   const totalPrice = cartSlots.reduce(
-    (sum, s) => sum + getPrice(formData.players, getTime(s)),
+    (sum, s) => sum + getPrice(formData.players, getTime(s), s.date),
     0
   );
 
@@ -320,7 +324,7 @@ export default function HomePageClient({
         players: formData.players,
         bookedSlots,
         failedSlots,
-        total: bookedSlots.reduce((sum, s) => sum + getPrice(formData.players, getTime(s)), 0),
+        total: bookedSlots.reduce((sum, s) => sum + getPrice(formData.players, getTime(s), s.date), 0),
         trainerName: trainer.name,
       });
       setFormData((current) => ({ ...current, players: 2 }));
@@ -455,7 +459,7 @@ export default function HomePageClient({
                         <span className="success-card-value" style={{ textAlign: "right" }}>
                           {successData.bookedSlots.map((s) => {
                             const t = getTime(s);
-                            const p = getPrice(successData.players, t);
+                            const p = getPrice(successData.players, t, s.date);
                             return (
                               <span key={s.id} style={{ display: "block" }}>
                                 ✅ {DAY_FULL_NL[parseDateLocal(slotDateKey(s.date)).getDay()]}{" "}
@@ -580,7 +584,7 @@ export default function HomePageClient({
                                           {DAY_FULL_NL[d.getDay()].slice(0,2)} {d.getDate()} {MONTH_SHORT_NL[d.getMonth()]} · {t}
                                           <small className="bk-cart-meta"> · {s.duration} min</small>
                                         </span>
-                                        <span className="bk-cart-price">€{getPrice(formData.players, t)}</span>
+                                        <span className="bk-cart-price">€{getPrice(formData.players, t, s.date)}</span>
                                         <button
                                           type="button"
                                           className="bk-cart-remove"
@@ -591,7 +595,7 @@ export default function HomePageClient({
                                     );
                                   })}
                                 </ul>
-                                <small className="bk-cart-note">incl. baanhuur (€20 dag / €30 vanaf 17:00)</small>
+                                <small className="bk-cart-note">incl. baanhuur (€20 dal / €30 piek: vanaf 17:00 &amp; weekend)</small>
                               </div>
 
                               {error && <div className="error-msg">{error}</div>}
@@ -613,7 +617,7 @@ export default function HomePageClient({
                                   {playersSelected && (
                                     <p className="price-hint">
                                       {cartSlots.length === 1
-                                        ? <>Prijs: <strong style={{ color:"#16a34a" }}>€{totalPrice}</strong> <small style={{ color:"#6b7280" }}>(incl. €{getBaanhuur(getTime(cartSlots[0]))} baanhuur)</small></>
+                                        ? <>Prijs: <strong style={{ color:"#16a34a" }}>€{totalPrice}</strong> <small style={{ color:"#6b7280" }}>(incl. €{getBaanhuur(getTime(cartSlots[0]), cartSlots[0].date)} baanhuur)</small></>
                                         : <>Totaal: <strong style={{ color:"#16a34a" }}>€{totalPrice}</strong> <small style={{ color:"#6b7280" }}>voor {cartSlots.length} lessen</small></>}
                                     </p>
                                   )}
@@ -719,7 +723,6 @@ export default function HomePageClient({
             <ul className="footer-col-list">
               <li>Sportcentrum Hoorn</li>
               <li>Holenweg 14a, 1624 PB Hoorn</li>
-              <li><a href="https://wa.me/31629896879" target="_blank" rel="noopener noreferrer" className="footer-link">WhatsApp Arn</a></li>
             </ul>
           </div>
           <div className="footer-col">
