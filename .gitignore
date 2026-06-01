@@ -45,3 +45,6 @@ next-env.d.ts
 /padel-booking/
 /test-results/
 /e2e/
+
+# backup of original (uncompressed) media — local only, do not deploy
+/.media-originals/

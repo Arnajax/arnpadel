@@ -19,7 +19,7 @@ export const TRAINERS: Trainer[] = [
   {
     id: "arn",
     name: "Arn Braunschweiger",
-    role: "Founder & Trainer",
+    role: "Top 150 NL · Trainer",
     bookable: true,
     bio: [
       "Ik ben Arn Braunschweiger, padeltrainer in Hoorn. Met 6 jaar ervaring en een notering in de Nederlandse top-150 help ik spelers van alle niveaus hun spel naar een hoger niveau tillen.",
@@ -65,7 +65,7 @@ export const TRAINERS: Trainer[] = [
       { label: "Ervaring", value: "5 jaar" },
       { label: "Opleiding", value: "ALO" },
     ],
-    photoSrc: "/floris-photo.png",
+    photoSrc: "/floris-photo.jpg",
     cta: "Binnenkort beschikbaar",
   },
 ];
