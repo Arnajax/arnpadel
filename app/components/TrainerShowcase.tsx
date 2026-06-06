@@ -277,12 +277,12 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
         }
         .ts-tab:hover {
           background: #222;
-          border-color: var(--deep-green);
+          border-color: var(--court);
           color: #fff;
         }
         .ts-tab--active {
-          background: var(--deep-green);
-          border-color: var(--deep-green);
+          background: var(--court);
+          border-color: var(--court);
           color: #fff;
         }
         .ts-tab-avatar {
@@ -328,7 +328,7 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
         .ts-role {
           font-size: 0.68rem;
           font-weight: 700;
-          color: var(--deep-green);
+          color: var(--court);
           text-transform: uppercase;
           letter-spacing: 0.1em;
           margin: 0 0 6px;
