@@ -346,14 +346,13 @@ export default function HomePageClient({
 
       {/* ── TOPNAV ── */}
       <nav className="site-nav">
-        <div className="site-nav-left">
-          <a href="#trainers" className="site-nav-link">Trainers</a>
-          <a href="#rackettest" className="site-nav-link">Rackets testen</a>
-        </div>
-        <div className="site-nav-center">
-          <img src="/phh-logo-horizontal.svg" alt="Padel Hub Hoorn" className="site-nav-logo-img" />
+        <div className="site-nav-brand">
+          <img src="/phh-pin.svg" alt="" aria-hidden className="site-nav-logo-img" />
+          <span className="site-nav-wordmark">Padel <span className="site-nav-wordmark-hub">Hub</span> Hoorn</span>
         </div>
         <div className="site-nav-right">
+          <a href="#trainers" className="site-nav-link">Trainers</a>
+          <a href="#rackettest" className="site-nav-link">Rackets testen</a>
           <button className="site-nav-cta" onClick={() => bookingRef.current?.scrollIntoView({ behavior: "smooth" })}>
             Boek nu →
           </button>
@@ -380,7 +379,7 @@ export default function HomePageClient({
             Padelles bij Sportcentrum Hoorn, alleen of met maximaal 3 vrienden.
           </p>
           <button className="hero-cta" onClick={() => bookingRef.current?.scrollIntoView({ behavior:"smooth" })}>
-            Kies je trainer →
+            Plan je eerste les →
           </button>
           <p className="hero-proof">Vanaf {PRICE_FROM} per persoon · Geen abonnement</p>
         </div>

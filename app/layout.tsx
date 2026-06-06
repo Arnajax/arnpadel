@@ -1,10 +1,23 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Space_Grotesk, Space_Mono } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
+
+const spaceMono = Space_Mono({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-space-mono",
   display: "swap",
 });
 
@@ -62,7 +75,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="nl" className={`${inter.variable} h-full antialiased`}>
+    <html lang="nl" className={`${inter.variable} ${spaceGrotesk.variable} ${spaceMono.variable} h-full antialiased`}>
       <head>
         <script
           dangerouslySetInnerHTML={{ __html: `(function(){document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});document.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});})();` }}

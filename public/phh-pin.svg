@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" fill="none">
+  <defs>
+    <clipPath id="c">
+      <path d="M90 176 C74 120 36 104 36 64 A54 54 0 1 1 144 64 C144 104 106 120 90 176Z"/>
+    </clipPath>
+  </defs>
+  <path d="M90 176 C74 120 36 104 36 64 A54 54 0 1 1 144 64 C144 104 106 120 90 176Z"
+        fill="oklch(0.56 0.140 151)"/>
+  <g clip-path="url(#c)">
+    <path d="M-26 0C98 32 98 104 -26 136"
+          stroke="oklch(0.96 0.018 95)" stroke-width="10" stroke-linecap="round" fill="none"/>
+    <path d="M206 0C82 32 82 104 206 136"
+          stroke="oklch(0.96 0.018 95)" stroke-width="10" stroke-linecap="round" fill="none"/>
+  </g>
+</svg>

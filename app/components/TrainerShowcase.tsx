@@ -232,8 +232,8 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
 
       <style jsx>{`
         .ts-section {
-          background: #f9f7f4;
-          border-top: 1px solid #ece9e4;
+          background: var(--cream);
+          border-top: 1px solid var(--border);
           padding: 80px 20px;
         }
         .ts-inner {
@@ -243,14 +243,14 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
         .ts-heading {
           font-size: clamp(1.8rem, 4vw, 2.4rem);
           font-weight: 800;
-          color: #1a1a2e;
+          color: var(--ink);
           margin: 0 0 8px;
           letter-spacing: -0.01em;
           text-align: center;
         }
         .ts-subline {
           text-align: center;
-          color: #6b7280;
+          color: var(--muted);
           font-size: 0.97rem;
           margin: 0 0 56px;
         }
@@ -267,7 +267,7 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
           gap: 0.5rem;
           padding: 6px 18px 6px 8px;
           border-radius: 999px;
-          border: 1.5px solid #e5e7eb;
+          border: 1.5px solid var(--border);
           background: #141414;
           color: #d1d5db;
           font-size: 0.88rem;
@@ -277,12 +277,12 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
         }
         .ts-tab:hover {
           background: #222;
-          border-color: #00a869;
+          border-color: var(--deep-green);
           color: #fff;
         }
         .ts-tab--active {
-          background: #00a869;
-          border-color: #00a869;
+          background: var(--deep-green);
+          border-color: var(--deep-green);
           color: #fff;
         }
         .ts-tab-avatar {
@@ -328,7 +328,7 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
         .ts-role {
           font-size: 0.68rem;
           font-weight: 700;
-          color: #00a869;
+          color: var(--deep-green);
           text-transform: uppercase;
           letter-spacing: 0.1em;
           margin: 0 0 6px;
@@ -336,7 +336,7 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
         .ts-name {
           font-size: clamp(1.5rem, 3vw, 2rem);
           font-weight: 800;
-          color: #1a1a2e;
+          color: var(--ink);
           margin: 0 0 20px;
           letter-spacing: -0.01em;
         }
@@ -345,7 +345,7 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
           gap: 0;
           margin-bottom: 20px;
           padding-bottom: 20px;
-          border-bottom: 1px solid #ece9e4;
+          border-bottom: 1px solid var(--border);
         }
         .ts-stat {
           flex: 1;
@@ -353,7 +353,7 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
           flex-direction: column;
           gap: 4px;
           padding-right: 20px;
-          border-right: 1px solid #ece9e4;
+          border-right: 1px solid var(--border);
         }
         .ts-stat:last-child {
           border-right: none;
@@ -366,13 +366,13 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
         .ts-stat-value {
           font-size: 1.2rem;
           font-weight: 800;
-          color: #1a1a2e;
+          color: var(--ink);
           line-height: 1;
         }
         .ts-stat-label {
           font-size: 0.65rem;
           font-weight: 600;
-          color: #9ca3af;
+          color: var(--muted);
           text-transform: uppercase;
           letter-spacing: 0.07em;
         }
@@ -384,7 +384,7 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
         .ts-para {
           font-size: 0.97rem;
           line-height: 1.75;
-          color: #4b5563;
+          color: var(--muted);
           margin: 0;
         }
         @media (max-width: 679px) {
