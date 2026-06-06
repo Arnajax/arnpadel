@@ -351,7 +351,8 @@ export default function HomePageClient({
           <a href="#rackettest" className="site-nav-link">Rackets testen</a>
         </div>
         <div className="site-nav-center">
-          <img src="/phh-logo-horizontal.svg" alt="Padel Hub Hoorn" className="site-nav-logo-img" />
+          <img src="/phh-pin.svg" alt="" aria-hidden className="site-nav-logo-img" style={{ height: 22, width: "auto" }} />
+          <span className="site-nav-wordmark">Padel <span className="site-nav-wordmark-hub">Hub</span> Hoorn</span>
         </div>
         <div className="site-nav-right">
           <button className="site-nav-cta" onClick={() => bookingRef.current?.scrollIntoView({ behavior: "smooth" })}>
