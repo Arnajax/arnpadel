@@ -35,6 +35,80 @@ body {
   overflow-x: hidden;
 }
 
+.offline-page {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 88px 20px 40px;
+  background:
+    radial-gradient(circle at 50% 0%, oklch(0.87 0.190 148 / 0.20), transparent 34rem),
+    var(--cream);
+}
+
+.offline-panel {
+  width: min(100%, 440px);
+  padding: 34px 28px 30px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: oklch(0.98 0.012 95);
+  color: var(--ink);
+  text-align: center;
+  box-shadow: var(--card-shadow);
+}
+
+.offline-mark {
+  display: block;
+  width: 74px;
+  height: 74px;
+  margin: 0 auto 18px;
+}
+
+.offline-kicker {
+  margin: 0 0 10px;
+  color: var(--court);
+  font-family: var(--font-space-mono), monospace;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.offline-panel h1 {
+  margin: 0;
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  font-size: 2rem;
+  line-height: 1.05;
+}
+
+.offline-panel p:not(.offline-kicker) {
+  margin: 14px auto 24px;
+  max-width: 34ch;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.offline-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid var(--court);
+  border-radius: 999px;
+  background: var(--court);
+  color: var(--cream);
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.offline-action:hover,
+.offline-action:focus-visible {
+  background: var(--deep-green);
+  border-color: var(--deep-green);
+}
+
 /* ── typografie ── */
 h1, h2, h3, h4,
 .hero-title,
@@ -163,7 +237,7 @@ h1, h2, h3, h4,
   flex-direction: column;
   align-items: flex-start;
   justify-content: flex-end;
-  padding: 120px 80px 96px;
+  padding: 120px 80px 64px;
   overflow: hidden;
 }
 
@@ -194,7 +268,7 @@ h1, h2, h3, h4,
   position: relative;
   z-index: 1;
   text-align: left;
-  max-width: 680px;
+  max-width: 880px;
   width: 100%;
 }
 
@@ -237,6 +311,7 @@ h1, h2, h3, h4,
   font-size: clamp(0.95rem, 2.5vw, 1.1rem);
   color: #ffffff;
   margin: 0 0 28px;
+  max-width: 60ch;
   line-height: 1.5;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.55), 0 2px 12px rgba(0, 0, 0, 0.45);
 }
@@ -290,6 +365,16 @@ h1, h2, h3, h4,
 @keyframes bob {
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50% { transform: translateX(-50%) translateY(6px); }
+}
+
+/* Mobiele overrides — NA de base .site-nav/.hero zodat ze winnen (same-specificity → laatste telt) */
+@media (max-width: 640px) {
+  /* logo gecentreerd (nav-right is hier al verborgen) */
+  .site-nav { justify-content: center; }
+  /* hero-overlay breder (minder zij-padding) + lager (kleinere bottom) */
+  .hero { padding: 96px 22px 56px; }
+  /* scroll-chevron verbergen op mobile (botst anders met de lager gezette tekst) */
+  .hero-scroll { display: none; }
 }
 
 /* ────────────────────────────────────────
@@ -1324,15 +1409,17 @@ h1, h2, h3, h4,
   .tp-grid {
     grid-template-columns: 1fr;
     gap: 14px;
+    max-width: 320px;
+    margin: 0 auto;
   }
   .tp-photo-wrap {
     aspect-ratio: 16 / 9;
   }
   .tp-body {
-    padding: 14px 18px 16px;
+    padding: 12px 14px 14px;
   }
   .tp-name {
-    font-size: 1.1rem;
+    font-size: 1rem;
   }
   .tp-role {
     font-size: 0.62rem;
@@ -1487,6 +1574,73 @@ h1, h2, h3, h4,
 }
 
 /* ────────────────────────────────────────
+   RITTENKAART — doorlopende marquee-banner (onder de trainers)
+   Full-bleed deep-green strip met bewegende cream-tekst.
+──────────────────────────────────────── */
+.ritten-marquee {
+  background: var(--deep-green);
+  color: var(--cream);
+  overflow: hidden;
+  position: relative;
+}
+/* zachte fade aan de randen zodat tekst in/uit het beeld vloeit */
+.ritten-marquee::before,
+.ritten-marquee::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 64px;
+  z-index: 2;
+  pointer-events: none;
+}
+.ritten-marquee::before { left: 0;  background: linear-gradient(90deg, var(--deep-green), transparent); }
+.ritten-marquee::after  { right: 0; background: linear-gradient(270deg, var(--deep-green), transparent); }
+.ritten-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: ritten-scroll 42s linear infinite;
+  will-change: transform;
+}
+.ritten-marquee:hover .ritten-marquee-track { animation-play-state: paused; }
+.rm-group { display: flex; align-items: center; flex-shrink: 0; }
+.rm-item { display: inline-flex; align-items: center; padding: 17px 0; }
+.rm-lead {
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 1.04rem;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+}
+.rm-sub {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--cream);
+  opacity: 0.72;
+  white-space: nowrap;
+}
+.rm-dot {
+  color: var(--mint);
+  font-size: 0.6rem;
+  margin: 0 26px;
+  opacity: 0.9;
+}
+@keyframes ritten-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@media (max-width: 600px) {
+  .rm-lead { font-size: 0.96rem; }
+  .rm-sub  { font-size: 0.88rem; }
+  .rm-dot  { margin: 0 18px; }
+  .rm-item { padding: 14px 0; }
+  .ritten-marquee-track { animation-duration: 30s; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ritten-marquee-track { animation: none; transform: none; }
+}
+
+/* ────────────────────────────────────────
    FOOTER (stap 6)
 ──────────────────────────────────────── */
 .site-footer {
@@ -1593,4 +1747,127 @@ h1, h2, h3, h4,
   font-size: 0.82rem;
   font-weight: 700;
   color: var(--navy);
+}
+
+/* ── INSTALL PROMPT (PWA add-to-home-screen) — iOS-native sheet styling ── */
+.install-sheet {
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  z-index: 300;
+  margin: 0 auto;
+  max-width: 430px;
+  background: rgba(250, 250, 252, 0.58);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 0.5px solid rgba(255, 255, 255, 0.45);
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 10px 40px rgba(0, 0, 0, 0.18);
+  padding: 14px 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif;
+  animation: install-slide-up 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+}
+@keyframes install-slide-up {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.install-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: rgba(120, 120, 128, 0.16);
+  color: rgba(60, 60, 67, 0.6);
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+.install-close:hover { background: rgba(120, 120, 128, 0.26); }
+.install-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+.install-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+.install-body { flex: 1; min-width: 0; padding-right: 22px; }
+.install-title {
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: -0.01em;
+  color: #1c1c1e;
+  margin: 0 0 1px;
+  line-height: 1.25;
+}
+.install-text {
+  font-size: 0.82rem;
+  color: rgba(60, 60, 67, 0.62);
+  margin: 0;
+  line-height: 1.4;
+}
+.install-cta {
+  margin-top: 10px;
+  width: 100%;
+  padding: 11px 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border-radius: 11px;
+}
+.install-steps {
+  margin: 3px 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: install-step;
+}
+.install-steps li {
+  position: relative;
+  padding-left: 25px;
+  margin-bottom: 5px;
+  font-size: 0.83rem;
+  color: #1c1c1e;
+  line-height: 1.4;
+}
+.install-steps li:last-child { margin-bottom: 0; }
+.install-steps li::before {
+  counter-increment: install-step;
+  content: counter(install-step);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--court);
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 600;
+  display: grid;
+  place-items: center;
+}
+.install-share-ico {
+  width: 16px;
+  height: 16px;
+  display: inline-block;
+  vertical-align: -3px;
+  color: #0a84ff;
+}
+.install-hint {
+  color: rgba(60, 60, 67, 0.55);
+  font-size: 0.78rem;
+}
+@media (prefers-reduced-motion: reduce) {
+  .install-sheet { animation: none; }
 }

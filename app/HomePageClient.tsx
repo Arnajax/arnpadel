@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import TrainerShowcase from "./components/TrainerShowcase";
 import TrainerPicker from "./components/TrainerPicker";
 import FloatingBookCTA from "./components/FloatingBookCTA";
+import InstallPrompt from "./components/InstallPrompt";
 import { TRAINERS } from "./_lib/trainers";
 import { PRICE_FROM } from "./_lib/constants";
 import type { Slot } from "./_lib/slots";
@@ -109,6 +110,7 @@ export default function HomePageClient({
     trainerName: string;
   } | null>(null);
   const [error, setError]           = useState<string | null>(null);
+  const [installPromptOpen, setInstallPromptOpen] = useState(false);
 
   const bookingRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -685,6 +687,30 @@ export default function HomePageClient({
         </div>
       </section>
 
+      {/* ── RITTENKAART MARQUEE (onder de trainers) ── */}
+      <section className="ritten-marquee" aria-label="Aanbieding: korting met een 10-rittenkaart">
+        <div className="ritten-marquee-track">
+          {[0, 1].map((g) => (
+            <div className="rm-group" key={g} aria-hidden={g === 1}>
+              {Array.from({ length: 3 }).flatMap((_, r) =>
+                [
+                  "Krijg korting met een 10-rittenkaart",
+                  "€75 per les in de daluren",
+                  "10 lessen voor €750",
+                  "je saldo in elke WhatsApp-bevestiging",
+                  "vraag je trainer",
+                ].map((p, i) => (
+                  <span className="rm-item" key={`${g}-${r}-${i}`}>
+                    <span className={i === 0 ? "rm-lead" : "rm-sub"}>{p}</span>
+                    <span className="rm-dot" aria-hidden>✦</span>
+                  </span>
+                ))
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ── KOBRO RACKETTEST ── */}
       <section className="kobro-section" id="rackettest">
         <div className="kobro-inner">
@@ -754,8 +780,16 @@ export default function HomePageClient({
         </div>
       </footer>
 
-      {/* ── FLOATING BOOK CTA ── */}
-      <FloatingBookCTA onBook={() => bookingRef.current?.scrollIntoView({ behavior: "smooth" })} />
+      {/* ── FLOATING BOOK CTA (verbergt zolang de install-sheet open is) ── */}
+      {!installPromptOpen && (
+        <FloatingBookCTA onBook={() => bookingRef.current?.scrollIntoView({ behavior: "smooth" })} />
+      )}
+
+      {/* ── INSTALL PROMPT (alleen homepage) ── */}
+      <InstallPrompt
+        bookingSucceeded={successData !== null}
+        onOpenChange={setInstallPromptOpen}
+      />
     </div>
   );
 }
