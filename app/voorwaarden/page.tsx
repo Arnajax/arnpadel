@@ -37,7 +37,7 @@ export default function VoorwaardenPage() {
 
       <h2 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: 12 }}>Privacy</h2>
       <p style={{ lineHeight: 1.8, marginBottom: 32 }}>
-        Je naam en telefoonnummer worden uitsluitend gebruikt voor de bevestiging en planning van je boeking. Je gegevens worden niet gedeeld met derden en niet bewaard na afronding van de les.
+        Je naam en telefoonnummer worden gebruikt voor de bevestiging en planning van je boeking en niet gedeeld met derden. Na afronding van de les bewaren we deze gegevens niet langer, behalve wanneer je een rittenkaart hebt: dan houden we je telefoonnummer en het resterende ritsaldo bij zolang de kaart geldig is (maximaal 12 maanden), zodat we je saldo correct kunnen bijhouden.
       </p>
 
       <a href="/" style={{ color: "#00a869", fontWeight: 600, textDecoration: "none" }}>← Terug naar home</a>

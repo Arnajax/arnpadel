@@ -685,6 +685,30 @@ export default function HomePageClient({
         </div>
       </section>
 
+      {/* ── RITTENKAART MARQUEE (onder de trainers) ── */}
+      <section className="ritten-marquee" aria-label="Aanbieding: korting met een 10-rittenkaart">
+        <div className="ritten-marquee-track">
+          {[0, 1].map((g) => (
+            <div className="rm-group" key={g} aria-hidden={g === 1}>
+              {Array.from({ length: 3 }).flatMap((_, r) =>
+                [
+                  "Krijg korting met een 10-rittenkaart",
+                  "€75 per les in de daluren",
+                  "10 lessen voor €750",
+                  "je saldo in elke WhatsApp-bevestiging",
+                  "vraag je trainer",
+                ].map((p, i) => (
+                  <span className="rm-item" key={`${g}-${r}-${i}`}>
+                    <span className={i === 0 ? "rm-lead" : "rm-sub"}>{p}</span>
+                    <span className="rm-dot" aria-hidden>✦</span>
+                  </span>
+                ))
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* ── KOBRO RACKETTEST ── */}
       <section className="kobro-section" id="rackettest">
         <div className="kobro-inner">

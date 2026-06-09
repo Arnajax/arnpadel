@@ -1487,6 +1487,73 @@ h1, h2, h3, h4,
 }
 
 /* ────────────────────────────────────────
+   RITTENKAART — doorlopende marquee-banner (onder de trainers)
+   Full-bleed deep-green strip met bewegende cream-tekst.
+──────────────────────────────────────── */
+.ritten-marquee {
+  background: var(--deep-green);
+  color: var(--cream);
+  overflow: hidden;
+  position: relative;
+}
+/* zachte fade aan de randen zodat tekst in/uit het beeld vloeit */
+.ritten-marquee::before,
+.ritten-marquee::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 64px;
+  z-index: 2;
+  pointer-events: none;
+}
+.ritten-marquee::before { left: 0;  background: linear-gradient(90deg, var(--deep-green), transparent); }
+.ritten-marquee::after  { right: 0; background: linear-gradient(270deg, var(--deep-green), transparent); }
+.ritten-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: ritten-scroll 42s linear infinite;
+  will-change: transform;
+}
+.ritten-marquee:hover .ritten-marquee-track { animation-play-state: paused; }
+.rm-group { display: flex; align-items: center; flex-shrink: 0; }
+.rm-item { display: inline-flex; align-items: center; padding: 17px 0; }
+.rm-lead {
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 1.04rem;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+}
+.rm-sub {
+  font-size: 0.95rem;
+  font-weight: 400;
+  color: var(--cream);
+  opacity: 0.72;
+  white-space: nowrap;
+}
+.rm-dot {
+  color: var(--mint);
+  font-size: 0.6rem;
+  margin: 0 26px;
+  opacity: 0.9;
+}
+@keyframes ritten-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+@media (max-width: 600px) {
+  .rm-lead { font-size: 0.96rem; }
+  .rm-sub  { font-size: 0.88rem; }
+  .rm-dot  { margin: 0 18px; }
+  .rm-item { padding: 14px 0; }
+  .ritten-marquee-track { animation-duration: 30s; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ritten-marquee-track { animation: none; transform: none; }
+}
+
+/* ────────────────────────────────────────
    FOOTER (stap 6)
 ──────────────────────────────────────── */
 .site-footer {
