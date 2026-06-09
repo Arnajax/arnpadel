@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk, Space_Mono } from "next/font/google";
+import PwaRuntime from "./components/PwaRuntime";
+import { EARLY_CAPTURE_SCRIPT } from "./_lib/install-eligibility";
 import "./globals.css";
 
 const inter = Inter({
@@ -26,11 +28,17 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
+  themeColor: "#f5f2e5",
 };
 
 export const metadata: Metadata = {
   title: "Padel Hub Hoorn — Privélessen bij de beste trainers",
   description: "Boek een privépadelles bij Padel Hub Hoorn. Kies jouw trainer en plan een moment. Alle niveaus welkom bij Sportcentrum Hoorn.",
+  appleWebApp: {
+    capable: true,
+    title: "Padel Hub",
+    statusBarStyle: "default",
+  },
 };
 
 const jsonLd = {
@@ -80,12 +88,16 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{ __html: `(function(){document.addEventListener('gesturestart',function(e){e.preventDefault();},{passive:false});document.addEventListener('touchmove',function(e){if(e.touches.length>1)e.preventDefault();},{passive:false});})();` }}
         />
+        <script dangerouslySetInnerHTML={{ __html: EARLY_CAPTURE_SCRIPT }} />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <PwaRuntime />
+        {children}
+      </body>
     </html>
   );
 }
