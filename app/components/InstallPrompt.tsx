@@ -126,8 +126,13 @@ export default function InstallPrompt({ bookingSucceeded, onOpenChange }: Props)
   }, []);
 
   // Reveal trigger 1: right after a successful booking.
+  // setTimeout defers the setState call out of the effect body to avoid
+  // the react-hooks/set-state-in-effect cascading-render lint error.
   useEffect(() => {
-    if (bookingSucceeded && variant) reveal();
+    if (bookingSucceeded && variant) {
+      const t = setTimeout(reveal, 0);
+      return () => clearTimeout(t);
+    }
   }, [bookingSucceeded, variant, reveal]);
 
   // Reveal trigger 2: shortly after load. Deliberately does NOT reset on scroll (that
