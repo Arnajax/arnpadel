@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Annulering & Voorwaarden — Padel Hub Hoorn",
@@ -40,7 +41,7 @@ export default function VoorwaardenPage() {
         Je naam en telefoonnummer worden gebruikt voor de bevestiging en planning van je boeking en niet gedeeld met derden. Na afronding van de les bewaren we deze gegevens niet langer, behalve wanneer je een rittenkaart hebt: dan houden we je telefoonnummer en het resterende ritsaldo bij zolang de kaart geldig is (maximaal 12 maanden), zodat we je saldo correct kunnen bijhouden.
       </p>
 
-      <a href="/" style={{ color: "#00a869", fontWeight: 600, textDecoration: "none" }}>← Terug naar home</a>
+      <Link href="/" style={{ color: "#00a869", fontWeight: 600, textDecoration: "none" }}>← Terug naar home</Link>
     </div>
   );
 }
