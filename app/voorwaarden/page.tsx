@@ -36,8 +36,11 @@ export default function VoorwaardenPage() {
       </p>
 
       <h2 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: 12 }}>Privacy</h2>
-      <p style={{ lineHeight: 1.8, marginBottom: 32 }}>
+      <p style={{ lineHeight: 1.8, marginBottom: 16 }}>
         Je naam en telefoonnummer worden gebruikt voor de bevestiging en planning van je boeking en niet gedeeld met derden. Na afronding van de les bewaren we deze gegevens niet langer, behalve wanneer je een rittenkaart hebt: dan houden we je telefoonnummer en het resterende ritsaldo bij zolang de kaart geldig is (maximaal 12 maanden), zodat we je saldo correct kunnen bijhouden.
+      </p>
+      <p style={{ lineHeight: 1.8, marginBottom: 32 }}>
+        Vraag je een <strong>clinic</strong> of <strong>video-analyse</strong> aan, dan verwerken we de gegevens die je in het formulier invult (naam of contactpersoon, telefoonnummer, e-mailadres, en eventueel bedrijfsnaam, gelegenheid, aantal deelnemers of je bericht). We gebruiken die uitsluitend om contact met je op te nemen en je aanvraag of offerte af te handelen. De gegevens worden niet met derden gedeeld en bewaren we alleen zolang nodig om je aanvraag op te volgen; daarna verwijderen we ze. Een video die je ons stuurt, gebruiken we enkel voor jouw analyse.
       </p>
 
       <a href="/" style={{ color: "#00a869", fontWeight: 600, textDecoration: "none" }}>← Terug naar home</a>

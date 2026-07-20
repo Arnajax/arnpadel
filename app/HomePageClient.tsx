@@ -115,6 +115,7 @@ export default function HomePageClient({
   const bookingRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const formRef    = useRef<HTMLDivElement>(null);
+  const successRef = useRef<HTMLDivElement>(null);
   const hasScrolledToForm = useRef(false);
 
   useEffect(() => {
@@ -143,6 +144,16 @@ export default function HomePageClient({
     }
   }, [formData.name, formData.phone]);
 
+  // Deep-link vanuit de rebook-landingspagina: ?trainer=<id> → trainer voorselecteren
+  // (de bestaande selectedTrainer-effect scrollt dan vanzelf naar de kalender)
+  useEffect(() => {
+    const t = new URLSearchParams(window.location.search).get("trainer");
+    if (t && TRAINERS.some((x) => x.id === t)) {
+      handleSelectTrainer(t);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Slots gefilterd op geselecteerde trainer
   const filteredSlots = useMemo(() => {
     if (!selectedTrainer) return slots;
@@ -164,6 +175,15 @@ export default function HomePageClient({
       setTimeout(() => calendarRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
     }
   }, [selectedTrainer]);
+
+  // Na een geslaagde boeking: scroll het successcherm in beeld (anders krimpt de
+  // pagina en blijft de scroll-offset op de Kobro-sectie hangen)
+  useEffect(() => {
+    if (!successData) return;
+    requestAnimationFrame(() =>
+      successRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+    );
+  }, [successData]);
 
   // Auto-scroll naar form alleen bij eerste slot in cart (niet bij elke toevoeging)
   useEffect(() => {
@@ -346,15 +366,19 @@ export default function HomePageClient({
   return (
     <div className="page-root">
 
-      {/* ── TOPNAV ── */}
+      {/* ── TOPNAV ── (links links · logo midden · CTA rechts) */}
       <nav className="site-nav">
+        <div className="site-nav-left">
+          <a href="#trainers" className="site-nav-link">Trainers</a>
+          <a href="/clinics" className="site-nav-link">Clinics</a>
+          <a href="/video-analyse" className="site-nav-link">Video-analyse</a>
+          <a href="#rackettest" className="site-nav-link">Rackets testen</a>
+        </div>
         <div className="site-nav-brand">
           <img src="/phh-pin.svg" alt="" aria-hidden className="site-nav-logo-img" />
           <span className="site-nav-wordmark">Padel <span className="site-nav-wordmark-hub">Hub</span> Hoorn</span>
         </div>
-        <div className="site-nav-right">
-          <a href="#trainers" className="site-nav-link">Trainers</a>
-          <a href="#rackettest" className="site-nav-link">Rackets testen</a>
+        <div className="site-nav-cta-wrap">
           <button className="site-nav-cta" onClick={() => bookingRef.current?.scrollIntoView({ behavior: "smooth" })}>
             Boek nu →
           </button>
@@ -434,7 +458,7 @@ export default function HomePageClient({
                     Geen beschikbare lessen bij {selectedTrainerData?.name ?? "deze trainer"} — check later opnieuw of kies een andere trainer.
                   </div>
                 ) : successData ? (
-                  <div className="success-block">
+                  <div className="success-block" ref={successRef}>
                     <CheckCircle/>
                     <h3 className="success-title">Aanvraag verzonden! 🎾</h3>
                     <p className="success-sub">
@@ -751,12 +775,11 @@ export default function HomePageClient({
             </ul>
           </div>
           <div className="footer-col">
-            <h4 className="footer-col-head">Lessen</h4>
+            <h4 className="footer-col-head">Aanbod</h4>
             <ul className="footer-col-list">
-              <li>Privé (1 persoon)</li>
-              <li>Duo (2 personen)</li>
-              <li>Trio (3 personen)</li>
-              <li>4 personen</li>
+              <li>Privélessen (1 tot 4 personen)</li>
+              <li><a href="/clinics" className="footer-link">Clinics &amp; bedrijfsuitjes</a></li>
+              <li><a href="/video-analyse" className="footer-link">Video-analyse</a></li>
             </ul>
           </div>
           <div className="footer-col">
