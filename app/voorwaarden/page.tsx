@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Annulering & Voorwaarden — Padel Hub Hoorn",
@@ -43,7 +44,7 @@ export default function VoorwaardenPage() {
         Vraag je een <strong>clinic</strong> of <strong>video-analyse</strong> aan, dan verwerken we de gegevens die je in het formulier invult (naam of contactpersoon, telefoonnummer, e-mailadres, en eventueel bedrijfsnaam, gelegenheid, aantal deelnemers of je bericht). We gebruiken die uitsluitend om contact met je op te nemen en je aanvraag of offerte af te handelen. De gegevens worden niet met derden gedeeld en bewaren we alleen zolang nodig om je aanvraag op te volgen; daarna verwijderen we ze. Een video die je ons stuurt, gebruiken we enkel voor jouw analyse.
       </p>
 
-      <a href="/" style={{ color: "#00a869", fontWeight: 600, textDecoration: "none" }}>← Terug naar home</a>
+      <Link href="/" style={{ color: "#00a869", fontWeight: 600, textDecoration: "none" }}>← Terug naar home</Link>
     </div>
   );
 }
