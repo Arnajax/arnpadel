@@ -1,16 +1,17 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 
 /** Vaste topbar (logo + terug-link) — gedeeld door de aanvraagpagina's. */
 export function FormTopbar() {
   return (
     <header className="fp-topbar">
-      <a href="/" className="fp-brand">
+      <Link href="/" className="fp-brand">
         <img src="/phh-pin.svg" alt="" aria-hidden className="site-nav-logo-img" />
         <span className="site-nav-wordmark">
           Padel <span className="site-nav-wordmark-hub">Hub</span> Hoorn
         </span>
-      </a>
-      <a href="/" className="fp-back">← Terug naar home</a>
+      </Link>
+      <Link href="/" className="fp-back">← Terug naar home</Link>
     </header>
   );
 }
