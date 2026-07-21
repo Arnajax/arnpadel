@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 
 // Indicatie-prijslogica — moet de CLINIC_*-constanten in padel_booking.py spiegelen.
 // De server blijft autoritatief: bij verzenden komt het echte bedrag terug.
@@ -104,9 +105,9 @@ export default function ClinicsClient() {
           {(extras.borrel || extras.diner) ? " Borrel, hapjes of diner stemmen we erbij af in de offerte." : ""}
           {" "}De definitieve prijs stemmen we samen af.
         </p>
-        <a href="/" className="btn-primary" style={{ marginTop: 24, display: "inline-block" }}>
+        <Link href="/" className="btn-primary" style={{ marginTop: 24, display: "inline-block" }}>
           Terug naar home
-        </a>
+        </Link>
       </div>
     );
   }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 type Niveau = "beginner" | "gevorderd" | "competitie";
 const NIVEAUS: { id: Niveau; label: string }[] = [
@@ -78,9 +79,9 @@ export default function VideoAnalyseClient() {
           Tip: film vanaf de zijkant of achter de baan, zodat je slagen goed in beeld zijn. Een paar
           rally&apos;s of een hele game is genoeg.
         </p>
-        <a href="/" className="btn-primary" style={{ marginTop: 24, display: "inline-block" }}>
+        <Link href="/" className="btn-primary" style={{ marginTop: 24, display: "inline-block" }}>
           Terug naar home
-        </a>
+        </Link>
       </div>
     );
   }
