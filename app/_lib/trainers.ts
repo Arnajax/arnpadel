@@ -68,4 +68,22 @@ export const TRAINERS: Trainer[] = [
     photoSrc: "/floris-photo.jpg",
     cta: "Binnenkort beschikbaar",
   },
+  {
+    id: "stephan",
+    name: "Stephan Horden",
+    role: "Wedstrijdspeler · Trainer",
+    bookable: false,
+    returnNote: "Binnenkort beschikbaar",
+    bio: [
+      "Ik ben Stephan Horden, fanatiek padeller en een bekend gezicht op de banen in Hoorn en omstreken. Padel is bij mij thuis een familiesport: mijn zoon staat net zo graag op de baan als ik.",
+      "Mijn lessen zijn energiek en praktijkgericht: veel ballen slaan, direct toepasbare tips en altijd afgestemd op jouw niveau en doelen.",
+    ],
+    stats: [
+      { label: "Achtergrond", value: "Competitie" },
+      { label: "Speelstijl", value: "Aanvallend" },
+      { label: "Thuisbaan", value: "Hoorn" },
+    ],
+    photoSrc: "/stephan-photo.jpg",
+    cta: "Binnenkort beschikbaar",
+  },
 ];

@@ -788,6 +788,7 @@ export default function HomePageClient({
               <li>Arn Braunschweiger</li>
               <li>Wessel Molenkamp</li>
               <li>Floris Coffeng</li>
+              <li>Stephan Horden</li>
             </ul>
           </div>
           <div className="footer-col">
