@@ -6,8 +6,8 @@ import type { Trainer } from "../_lib/trainers";
 export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [autoplay, setAutoplay] = useState(true);
   const imageContainerRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 680);
@@ -20,14 +20,15 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
   const active = trainers[activeIndex];
 
   useEffect(() => {
-    intervalRef.current = setInterval(() => {
+    if (!autoplay) return;
+    const id = setInterval(() => {
       setActiveIndex((p) => (p + 1) % count);
     }, 6000);
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [count]);
+    return () => clearInterval(id);
+  }, [autoplay, count]);
 
   const go = useCallback((dir: 1 | -1) => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    setAutoplay(false);
     setActiveIndex((p) => (p + dir + count) % count);
   }, [count]);
 
@@ -153,7 +154,7 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
             <button
               key={t.id}
               className={`ts-tab${i === activeIndex ? " ts-tab--active" : ""}`}
-              onClick={() => { if (intervalRef.current) clearInterval(intervalRef.current); setActiveIndex(i); }}
+              onClick={() => { setAutoplay(false); setActiveIndex(i); }}
             >
               <img src={t.photoSrc} className="ts-tab-avatar" alt={t.name} onError={(e) => { (e.target as HTMLImageElement).src = "/arn-photo.jpg"; }} />
               <span>{t.name.split(" ")[0]}</span>
@@ -178,7 +179,7 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
                 alt={t.name}
                 className="ts-img"
                 style={getImgStyle(i)}
-                onClick={() => { if (i !== activeIndex) { if (intervalRef.current) clearInterval(intervalRef.current); setActiveIndex(i); } }}
+                onClick={() => { if (i !== activeIndex) { setAutoplay(false); setActiveIndex(i); } }}
                 onError={(e) => { (e.target as HTMLImageElement).src = "/arn-photo.jpg"; }}
               />
             ))}
@@ -275,10 +276,15 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
           cursor: pointer;
           transition: background 0.2s, color 0.2s, border-color 0.2s;
         }
-        .ts-tab:hover {
-          background: #222;
-          border-color: var(--court);
-          color: #fff;
+        @media (hover: hover) {
+          .ts-tab:hover {
+            background: #222;
+            border-color: var(--court);
+            color: #fff;
+          }
+          .ts-tab--active:hover {
+            background: var(--court);
+          }
         }
         .ts-tab--active {
           background: var(--court);
