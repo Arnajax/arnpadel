@@ -1301,6 +1301,7 @@ h1, h2, h3, h4,
 .tp-card {
   display: flex;
   flex-direction: column;
+  height: 100%;
   background: #fff;
   border: 1.5px solid var(--border);
   border-radius: 20px;
@@ -1380,6 +1381,7 @@ h1, h2, h3, h4,
   display: flex;
   flex-direction: column;
   gap: 4px;
+  flex: 1;
 }
 .tp-role {
   font-size: 0.6rem;
@@ -1400,11 +1402,11 @@ h1, h2, h3, h4,
   font-size: 0.72rem;
   font-weight: 600;
   color: var(--muted);
-  margin: 2px 0 0;
+  margin: 2px 0 8px;
   letter-spacing: 0.01em;
 }
 .tp-cta-btn {
-  margin-top: 12px;
+  margin-top: auto;
   display: inline-block;
   background: var(--green);
   color: #fff;
@@ -1421,30 +1423,41 @@ h1, h2, h3, h4,
 }
 @media (max-width: 720px) {
   .tp-grid {
-    grid-template-columns: 1fr;
-    gap: 14px;
-    max-width: 320px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    max-width: 420px;
     margin: 0 auto;
   }
+  .tp-grid:has(> :only-child) {
+    grid-template-columns: 1fr;
+    max-width: 320px;
+  }
   .tp-photo-wrap {
-    aspect-ratio: 16 / 9;
+    aspect-ratio: 4 / 3;
   }
   .tp-body {
-    padding: 12px 14px 14px;
+    padding: 10px 12px 12px;
   }
   .tp-name {
-    font-size: 1rem;
+    font-size: 0.92rem;
   }
   .tp-role {
-    font-size: 0.62rem;
+    font-size: 0.56rem;
   }
   .tp-niveau {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
   }
   .tp-cta-btn {
-    font-size: 0.8rem;
-    padding: 8px 18px;
-    margin-top: 10px;
+    display: block;
+    text-align: center;
+    font-size: 0.72rem;
+    padding: 7px 10px;
+  }
+  .tp-unavailable-badge {
+    font-size: 0.55rem;
+    padding: 4px 8px;
+    top: 6px;
+    right: 6px;
   }
 }
 
