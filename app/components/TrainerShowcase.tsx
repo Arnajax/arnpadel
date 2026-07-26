@@ -388,6 +388,17 @@ export default function TrainerShowcase({ trainers }: { trainers: Trainer[] }) {
           margin: 0;
         }
         @media (max-width: 679px) {
+          .ts-tabs {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.6rem;
+            max-width: 320px;
+            margin: 0 auto 2.5rem;
+          }
+          .ts-tab {
+            justify-content: center;
+            padding: 6px 12px;
+          }
           .ts-content {
             align-items: center;
             text-align: center;
