@@ -8,6 +8,7 @@ import FloatingBookCTA from "./components/FloatingBookCTA";
 import InstallPrompt from "./components/InstallPrompt";
 import { TRAINERS } from "./_lib/trainers";
 import { PRICE_FROM } from "./_lib/constants";
+import { canonicalPhone, formatPhone, phoneError } from "./_lib/phone";
 import type { Slot } from "./_lib/slots";
 
 interface FormData {
@@ -100,6 +101,11 @@ export default function HomePageClient({
   const [viewMonth, setViewMonth]   = useState(new Date().getMonth());
   const [formData, setFormData]     = useState<FormData>({ name: "", phone: "", players: 2 });
   const [playersSelected, setPlayersSelected] = useState(false);
+  // Telefoon is het enige kanaal waarop we de leerling kunnen bereiken — een typefout
+  // betekent een les die niemand komt spelen. Live valideren + het genormaliseerde
+  // nummer terugtonen, zodat de klant zijn eigen fout ziet vóór hij bevestigt.
+  const phoneCanon = useMemo(() => canonicalPhone(formData.phone), [formData.phone]);
+  const phoneIssue = useMemo(() => phoneError(formData.phone), [formData.phone]);
   const [submitting, setSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<{
     name: string;
@@ -305,6 +311,7 @@ export default function HomePageClient({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (selectedSlotIds.size === 0) { setError("Selecteer eerst minstens één tijdslot."); return; }
+    if (!phoneCanon) { setError(phoneError(formData.phone) ?? "Vul je 06-nummer in."); return; }
     setSubmitting(true);
     setError(null);
     try {
@@ -314,7 +321,7 @@ export default function HomePageClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
-          phone: formData.phone,
+          phone: phoneCanon,
           players: formData.players,
           slotIds,
           trainerId: selectedTrainer ?? "arn",
@@ -660,12 +667,23 @@ export default function HomePageClient({
                                   <label className="field-label" htmlFor="bk-phone">Telefoon</label>
                                   <input
                                     id="bk-phone" type="tel" required
-                                    className="field-input" placeholder="06 12 34 56 78"
+                                    inputMode="tel" autoComplete="tel"
+                                    aria-invalid={phoneIssue ? true : undefined}
+                                    aria-describedby="bk-phone-hint"
+                                    className={`field-input${phoneIssue ? " field-input--invalid" : ""}`}
+                                    placeholder="06 12 34 56 78"
                                     value={formData.phone}
                                     onChange={e => setFormData(f => ({ ...f, phone: e.target.value }))}
                                   />
+                                  <p id="bk-phone-hint" className={`phone-hint${phoneIssue ? " phone-hint--error" : ""}`} aria-live="polite">
+                                    {phoneIssue
+                                      ? phoneIssue
+                                      : phoneCanon
+                                        ? <>We appen je op <strong>{formatPhone(phoneCanon)}</strong></>
+                                        : "Hier sturen we je bevestiging naartoe via WhatsApp."}
+                                  </p>
                                 </div>
-                                <button type="submit" disabled={submitting} className="btn-confirm">
+                                <button type="submit" disabled={submitting || !phoneCanon} className="btn-confirm">
                                   {submitting
                                     ? <span className="spinner-row"><span className="spinner"/>Versturen…</span>
                                     : cartSlots.length === 1

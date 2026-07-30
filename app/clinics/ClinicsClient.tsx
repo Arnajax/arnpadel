@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { canonicalPhone, formatPhone, phoneError } from "../_lib/phone";
 
 // Indicatie-prijslogica — moet de CLINIC_*-constanten in padel_booking.py spiegelen.
 // De server blijft autoritatief: bij verzenden komt het echte bedrag terug.
@@ -57,10 +58,18 @@ export default function ClinicsClient() {
     return { total, billable, n };
   }, [form.deelnemers, extras.extra_uur]);
 
+  // Een onbereikbare aanvrager is een verloren offerte — valideer vóór verzenden.
+  const telefoonCanon = canonicalPhone(form.telefoon);
+  const telefoonIssue = phoneError(form.telefoon);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!type) {
       setError("Kies eerst het type clinic.");
+      return;
+    }
+    if (!telefoonCanon) {
+      setError(telefoonIssue ?? "Vul je 06-nummer in.");
       return;
     }
     setSubmitting(true);
@@ -69,7 +78,7 @@ export default function ClinicsClient() {
       const res = await fetch("/api/clinics", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, ...extras, type, deelnemers: Number(form.deelnemers) }),
+        body: JSON.stringify({ ...form, ...extras, type, telefoon: telefoonCanon, deelnemers: Number(form.deelnemers) }),
       });
       const data = (await res.json().catch(() => null)) as
         | (OfferteResult & { error?: string })
@@ -200,8 +209,17 @@ export default function ClinicsClient() {
 
       <div className="field">
         <label className="field-label" htmlFor="c-phone">Telefoon</label>
-        <input id="c-phone" type="tel" required className="field-input" placeholder="06 12 34 56 78"
+        <input id="c-phone" type="tel" required inputMode="tel" autoComplete="tel"
+          aria-invalid={telefoonIssue ? true : undefined} aria-describedby="c-phone-hint"
+          className={`field-input${telefoonIssue ? " field-input--invalid" : ""}`} placeholder="06 12 34 56 78"
           value={form.telefoon} onChange={(e) => set("telefoon", e.target.value)} />
+        <p id="c-phone-hint" className={`phone-hint${telefoonIssue ? " phone-hint--error" : ""}`} aria-live="polite">
+          {telefoonIssue
+            ? telefoonIssue
+            : telefoonCanon
+              ? <>We bellen of appen je op <strong>{formatPhone(telefoonCanon)}</strong></>
+              : "Hier nemen we contact met je op."}
+        </p>
       </div>
 
       <div className="field">
@@ -227,7 +245,7 @@ export default function ClinicsClient() {
 
       {error && <div className="error-msg" role="alert">{error}</div>}
 
-      <button type="submit" disabled={submitting} className="btn-confirm">
+      <button type="submit" disabled={submitting || !telefoonCanon} className="btn-confirm">
         {submitting ? "Versturen…" : "Bevestig en vraag offerte aan"}
       </button>
       <p className="fp-note">Je krijgt direct een richtprijs te zien. Geen betaling, geen verplichting.</p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { canonicalPhone, formatPhone, phoneError } from "../_lib/phone";
 
 type Niveau = "beginner" | "gevorderd" | "competitie";
 const NIVEAUS: { id: Niveau; label: string }[] = [
@@ -30,10 +31,18 @@ export default function VideoAnalyseClient() {
     setForm((f) => ({ ...f, [k]: v }));
   }
 
+  // Zonder bereikbaar nummer kunnen we de analyse niet terugkoppelen.
+  const telefoonCanon = canonicalPhone(form.telefoon);
+  const telefoonIssue = phoneError(form.telefoon);
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!niveau) {
       setError("Kies eerst je niveau.");
+      return;
+    }
+    if (!telefoonCanon) {
+      setError(telefoonIssue ?? "Vul je 06-nummer in.");
       return;
     }
     setSubmitting(true);
@@ -42,7 +51,7 @@ export default function VideoAnalyseClient() {
       const res = await fetch("/api/video-analyse", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, niveau }),
+        body: JSON.stringify({ ...form, telefoon: telefoonCanon, niveau }),
       });
       const data = (await res.json().catch(() => null)) as { error?: string } | null;
       if (!res.ok) {
@@ -113,8 +122,17 @@ export default function VideoAnalyseClient() {
 
       <div className="field">
         <label className="field-label" htmlFor="v-phone">Telefoon</label>
-        <input id="v-phone" type="tel" required className="field-input" placeholder="06 12 34 56 78"
+        <input id="v-phone" type="tel" required inputMode="tel" autoComplete="tel"
+          aria-invalid={telefoonIssue ? true : undefined} aria-describedby="v-phone-hint"
+          className={`field-input${telefoonIssue ? " field-input--invalid" : ""}`} placeholder="06 12 34 56 78"
           value={form.telefoon} onChange={(e) => set("telefoon", e.target.value)} />
+        <p id="v-phone-hint" className={`phone-hint${telefoonIssue ? " phone-hint--error" : ""}`} aria-live="polite">
+          {telefoonIssue
+            ? telefoonIssue
+            : telefoonCanon
+              ? <>We appen je op <strong>{formatPhone(telefoonCanon)}</strong></>
+              : "Via dit nummer stuur je straks je video."}
+        </p>
       </div>
 
       <div className="field">
@@ -148,7 +166,7 @@ export default function VideoAnalyseClient() {
 
       {error && <div className="error-msg">{error}</div>}
 
-      <button type="submit" disabled={submitting} className="btn-confirm">
+      <button type="submit" disabled={submitting || !telefoonCanon} className="btn-confirm">
         {submitting ? "Versturen…" : "Aanvragen"}
       </button>
       <p className="fp-note">Na je aanvraag stuur je de video eenvoudig via WhatsApp. Geen upload nodig.</p>
