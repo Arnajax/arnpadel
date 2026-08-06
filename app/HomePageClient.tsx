@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThinkingOrb } from "thinking-orbs";
 import TrainerShowcase from "./components/TrainerShowcase";
 import TrainerPicker from "./components/TrainerPicker";
 import FloatingBookCTA from "./components/FloatingBookCTA";
@@ -685,7 +686,7 @@ export default function HomePageClient({
                                 </div>
                                 <button type="submit" disabled={submitting || !phoneCanon} className="btn-confirm">
                                   {submitting
-                                    ? <span className="spinner-row"><span className="spinner"/>Versturen…</span>
+                                    ? <span className="spinner-row"><ThinkingOrb state="composing" size={20} theme="dark" aria-label="Boeking versturen…" />Versturen…</span>
                                     : cartSlots.length === 1
                                       ? "Bevestig boeking"
                                       : `Bevestig boeking (${cartSlots.length} lessen · €${totalPrice})`}
