@@ -1608,6 +1608,68 @@ h1, h2, h3, h4,
 }
 
 /* ────────────────────────────────────────
+   COMMUNITY — WhatsApp spelersgroep (full-bleed deep-green band vóór footer)
+──────────────────────────────────────── */
+.community-section {
+  background: var(--deep-green);
+  color: var(--cream);
+  padding: clamp(56px, 8vw, 84px) 24px;
+  text-align: center;
+}
+.community-inner {
+  max-width: 680px;
+  margin: 0 auto;
+}
+.community-eyebrow {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--mint);
+  margin-bottom: 18px;
+}
+.community-heading {
+  font-size: clamp(1.6rem, 4vw, 2.4rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  margin: 0 0 16px;
+  color: var(--cream);
+}
+.community-body {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.82);
+  margin: 0 0 32px;
+}
+.community-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--mint);
+  color: var(--ink);
+  border-radius: 999px;
+  padding: 14px 30px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.15s, background 0.18s;
+}
+.community-cta:hover {
+  background: #fff;
+  transform: scale(1.02);
+}
+.community-cta-icon {
+  flex-shrink: 0;
+}
+.community-note {
+  margin: 18px 0 0;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+/* ────────────────────────────────────────
    RITTENKAART — doorlopende marquee-banner (onder de trainers)
    Full-bleed deep-green strip met bewegende cream-tekst.
 ──────────────────────────────────────── */
