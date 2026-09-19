@@ -783,22 +783,6 @@ export default function HomePageClient({
       {/* ── ABOUT ── */}
       <TrainerShowcase trainers={TRAINERS} />
 
-      {/* ── IN HERINNERING (Stephan Horden) ── */}
-      <section className="memoriam-section" aria-label="In herinnering aan Stephan Horden">
-        <div className="memoriam-inner">
-          <img src="/stephan-photo.jpg" alt="Stephan Horden" className="memoriam-photo" />
-          <p className="memoriam-eyebrow">In herinnering</p>
-          <h2 className="memoriam-name">Stephan Horden</h2>
-          <p className="memoriam-body">
-            Stephan was een bekend gezicht op de banen in Hoorn, maar nog bekender was zijn mooie grote en vooral witte lach. Als hij binnenkwam voelde je de positieve, vrolijke en enthousiaste energie de ruimte in komen.
-          </p>
-          <p className="memoriam-body">
-            Hij was fanatiek, altijd in voor een potje, en iemand die van padel een familiesport maakte: zijn zoon stond net zo graag op de baan als hij.
-          </p>
-          <p className="memoriam-close">We zullen hem voor altijd missen ❤️</p>
-        </div>
-      </section>
-
       {/* ── COMMUNITY (WhatsApp spelersgroep) ── */}
       <section className="community-section" aria-label="Word lid van de Padel Hub Hoorn community">
         <div className="community-inner">
@@ -819,6 +803,22 @@ export default function HomePageClient({
             Word lid via WhatsApp
           </a>
           <p className="community-note">Spelersgroep · potjes &amp; maatjes · niveaugroepen</p>
+        </div>
+      </section>
+
+      {/* ── IN HERINNERING (Stephan Horden) ── */}
+      <section className="memoriam-section" aria-label="In herinnering aan Stephan Horden">
+        <div className="memoriam-inner">
+          <img src="/stephan-photo.jpg" alt="Stephan Horden" className="memoriam-photo" />
+          <p className="memoriam-eyebrow">In herinnering</p>
+          <h2 className="memoriam-name">Stephan Horden</h2>
+          <p className="memoriam-body">
+            Stephan was een bekend gezicht op de banen in Hoorn, maar nog bekender was zijn mooie grote en vooral witte lach. Als hij binnenkwam voelde je de positieve, vrolijke en enthousiaste energie de ruimte in komen.
+          </p>
+          <p className="memoriam-body">
+            Hij was fanatiek, altijd in voor een potje, en iemand die van padel een familiesport maakte: zijn zoon stond net zo graag op de baan als hij.
+          </p>
+          <p className="memoriam-close">We zullen hem voor altijd missen ❤️</p>
         </div>
       </section>
 
