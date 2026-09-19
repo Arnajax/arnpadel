@@ -36,7 +36,7 @@ export default function VoorwaardenPage() {
         Betaling vindt plaats voor of direct na de les, in overleg met de trainer. Acceptabele betaalmethoden worden vooraf afgestemd.
       </p>
 
-      <h2 style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: 12 }}>Privacy</h2>
+      <h2 id="privacy" style={{ fontSize: "1.1rem", fontWeight: 700, marginBottom: 12, scrollMarginTop: 100 }}>Privacy</h2>
       <p style={{ lineHeight: 1.8, marginBottom: 16 }}>
         Je naam en telefoonnummer worden gebruikt voor de bevestiging en planning van je boeking en niet gedeeld met derden. Na afronding van de les bewaren we deze gegevens niet langer, behalve wanneer je een rittenkaart hebt: dan houden we je telefoonnummer en het resterende ritsaldo bij zolang de kaart geldig is (maximaal 12 maanden), zodat we je saldo correct kunnen bijhouden.
       </p>

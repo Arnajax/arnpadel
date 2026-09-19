@@ -377,7 +377,7 @@ export default function HomePageClient({
       {/* ── TOPNAV ── (links links · logo midden · CTA rechts) */}
       <nav className="site-nav">
         <div className="site-nav-left">
-          <a href="#trainers" className="site-nav-link">Trainers</a>
+          <a href="#trainers" className="site-nav-link site-nav-link-desktop">Trainers</a>
           <a href="/clinics" className="site-nav-link">Clinics</a>
           <a href="/video-analyse" className="site-nav-link">Video-analyse</a>
           <a href="#rackettest" className="site-nav-link">Rackets testen</a>
@@ -783,6 +783,22 @@ export default function HomePageClient({
       {/* ── ABOUT ── */}
       <TrainerShowcase trainers={TRAINERS} />
 
+      {/* ── IN HERINNERING (Stephan Horden) ── */}
+      <section className="memoriam-section" aria-label="In herinnering aan Stephan Horden">
+        <div className="memoriam-inner">
+          <img src="/stephan-photo.jpg" alt="Stephan Horden" className="memoriam-photo" />
+          <p className="memoriam-eyebrow">In herinnering</p>
+          <h2 className="memoriam-name">Stephan Horden</h2>
+          <p className="memoriam-body">
+            Stephan was een bekend gezicht op de banen in Hoorn, maar nog bekender was zijn mooie grote en vooral witte lach. Als hij binnenkwam voelde je de positieve, vrolijke en enthousiaste energie de ruimte in komen.
+          </p>
+          <p className="memoriam-body">
+            Hij was fanatiek, altijd in voor een potje, en iemand die van padel een familiesport maakte: zijn zoon stond net zo graag op de baan als hij.
+          </p>
+          <p className="memoriam-close">We zullen hem voor altijd missen ❤️</p>
+        </div>
+      </section>
+
       {/* ── COMMUNITY (WhatsApp spelersgroep) ── */}
       <section className="community-section" aria-label="Word lid van de Padel Hub Hoorn community">
         <div className="community-inner">
@@ -830,14 +846,13 @@ export default function HomePageClient({
               <li>Arn Braunschweiger</li>
               <li>Wessel Molenkamp</li>
               <li>Floris Coffeng</li>
-              <li>Stephan Horden</li>
             </ul>
           </div>
           <div className="footer-col">
             <h4 className="footer-col-head">Juridisch</h4>
             <ul className="footer-col-list">
               <li><a href="/voorwaarden" className="footer-link">Annulering &amp; voorwaarden</a></li>
-              <li><a href="/voorwaarden" className="footer-link">Privacy</a></li>
+              <li><a href="/voorwaarden#privacy" className="footer-link">Privacy</a></li>
             </ul>
           </div>
         </div>

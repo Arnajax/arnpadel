@@ -46,9 +46,9 @@ const jsonLd = {
   "@graph": [
     {
       "@type": "SportsActivityLocation",
-      "@id": "https://padelhubhoorn.vercel.app/#business",
+      "@id": "https://padelhubhoorn.nl/#business",
       "name": "Padel Hub Hoorn",
-      "url": "https://padelhubhoorn.vercel.app",
+      "url": "https://padelhubhoorn.nl",
       "telephone": "+31629896879", // TODO: confirm or replace with official business number if different
       "priceRange": "€€",
       "address": {
@@ -58,21 +58,21 @@ const jsonLd = {
         "postalCode": "1624 PB",
         "addressCountry": "NL",
       },
-      "image": "https://padelhubhoorn.vercel.app/arn-photo.jpg",
+      "image": "https://padelhubhoorn.nl/arn-photo.jpg",
     },
     {
       "@type": "Person",
       "name": "Arn Braunschweiger",
       "jobTitle": "Padeltrainer",
-      "image": "https://padelhubhoorn.vercel.app/arn-photo.jpg",
-      "worksFor": { "@id": "https://padelhubhoorn.vercel.app/#business" },
+      "image": "https://padelhubhoorn.nl/arn-photo.jpg",
+      "worksFor": { "@id": "https://padelhubhoorn.nl/#business" },
     },
     {
       "@type": "Person",
       "name": "Wessel Molenkamp",
       "jobTitle": "Padeltrainer",
-      "image": "https://padelhubhoorn.vercel.app/wessel-photo.jpg",
-      "worksFor": { "@id": "https://padelhubhoorn.vercel.app/#business" },
+      "image": "https://padelhubhoorn.nl/wessel-photo.jpg",
+      "worksFor": { "@id": "https://padelhubhoorn.nl/#business" },
     },
   ],
 };
