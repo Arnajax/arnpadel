@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // De schema-afbeelding leest fonts en sfeerfoto's van schijf; zorg dat ze in de functie meegaan.
+  outputFileTracingIncludes: {
+    "/api/toernooi/\\[code\\]/schema.png": ["./assets/fonts/**", "./public/toernooi/**"],
+  },
   async redirects() {
     return [
       {

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThinkingOrb } from "thinking-orbs";
@@ -803,6 +804,7 @@ export default function HomePageClient({
             Word lid via WhatsApp
           </a>
           <p className="community-note">Spelersgroep · potjes &amp; maatjes · niveaugroepen</p>
+          <Link href="/toernooi" className="community-secondary">Organiseer je een toernooitje? Zet het hier klaar →</Link>
         </div>
       </section>
 
@@ -838,6 +840,7 @@ export default function HomePageClient({
               <li>Privélessen (1 tot 4 personen)</li>
               <li><a href="/clinics" className="footer-link">Clinics &amp; bedrijfsuitjes</a></li>
               <li><a href="/video-analyse" className="footer-link">Video-analyse</a></li>
+              <li><Link href="/toernooi" className="footer-link">Toernooitje organiseren</Link></li>
             </ul>
           </div>
           <div className="footer-col">
