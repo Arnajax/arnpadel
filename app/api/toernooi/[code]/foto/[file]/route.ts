@@ -26,7 +26,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ code: s
     return new Response(Buffer.from(hit.bytes), {
       headers: {
         "Content-Type": "image/jpeg",
-        "Cache-Control": "public, max-age=3600, s-maxage=3600",
+        // Alleen de browser mag bewaren, nooit de Vercel-cache: anders blijft een gewiste of
+        // afgemelde foto nog een uur op te halen via de link.
+        "Cache-Control": "private, max-age=3600",
         "X-Robots-Tag": "noindex",
       },
     });

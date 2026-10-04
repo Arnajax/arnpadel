@@ -1,11 +1,13 @@
-// Opslag voor de toernooitool. Productie: Vercel Blob (private store). Lokaal en in tests: een
-// map op schijf met dezelfde spelregels (etag + "alleen schrijven als niemand ertussen kwam"),
+// Opslag voor de toernooitool. Productie: Upstash Redis (sinds 4 okt; de gratis Blob-limiet van
+// 2.000 schrijfacties per maand bleek te krap). Vercel Blob blijft als terugval. Lokaal en in tests:
+// een map op schijf met dezelfde spelregels (etag + "alleen schrijven als niemand ertussen kwam"),
 // zodat de gelijktijdigheidstest ook lokaal iets bewijst.
 
 import crypto from "node:crypto";
 import { mkdir, readFile, rename, rm, writeFile, readdir } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { BlobPreconditionFailedError, del, get, list, put } from "@vercel/blob";
+import { Redis } from "@upstash/redis";
 
 import { ToernooiError } from "./core.js";
 
@@ -94,6 +96,71 @@ class BlobStore implements Store {
       }
       cursor = page.hasMore ? page.cursor : undefined;
     } while (cursor);
+    return count;
+  }
+}
+
+// ── Upstash Redis ─────────────────────────────────────────────────────────────
+
+// Toernooi = hash { doc, rev }. `rev` wisselt bij elke schrijfactie en is de etag. Controleren en
+// schrijven in één script, dus atomair: wie ertussen kwam, krijgt 0 terug.
+const WRITE_DOC = `
+local rev = redis.call('HGET', KEYS[1], 'rev')
+if ARGV[1] == '' then
+  if rev then return 0 end
+elseif rev ~= ARGV[1] then
+  return 0
+end
+redis.call('HSET', KEYS[1], 'doc', ARGV[2], 'rev', ARGV[3])
+return 1
+`;
+
+// Paden zijn sleutels; tekens die SCAN als patroon leest moeten letterlijk blijven.
+const globEscape = (s: string) => s.replace(/[\\*?[\]]/g, "\\$&");
+
+class RedisStore implements Store {
+  private redis: Redis;
+
+  constructor(url: string, token: string) {
+    // Zelf (de)serialiseren: het document moet als exacte tekst heen en terug.
+    this.redis = new Redis({ url, token, automaticDeserialization: false });
+  }
+
+  // Met automaticDeserialization uit geeft HMGET het ruwe antwoord: waarden in dezelfde volgorde.
+  private async fields(key: string, names: string[]) {
+    return ((await this.redis.hmget(key, ...names)) ?? []) as unknown as (string | null)[];
+  }
+
+  async readDoc(code: string) {
+    const [doc, rev] = await this.fields(docPath(code), ["doc", "rev"]);
+    if (!doc || !rev) return null;
+    return { doc: JSON.parse(doc) as Tournament, etag: rev };
+  }
+
+  async writeDoc(code: string, doc: Tournament, etag: string | null) {
+    const ok = await this.redis.eval(WRITE_DOC, [docPath(code)], [etag ?? "", JSON.stringify(doc), crypto.randomUUID()]);
+    if (Number(ok) !== 1) throw new ConflictError(etag ? "etag" : "exists");
+  }
+
+  async putFile(path: string, bytes: Uint8Array, contentType: string) {
+    await this.redis.hset(path, { b: Buffer.from(bytes).toString("base64"), t: contentType });
+  }
+
+  async getFile(path: string) {
+    const [b, type] = await this.fields(path, ["b", "t"]);
+    if (!b) return null;
+    return { bytes: new Uint8Array(Buffer.from(b, "base64")), contentType: type || "application/octet-stream" };
+  }
+
+  // Zelfde gedrag als Blob: alles waarvan het pad met `prefix` begint.
+  async deletePrefix(prefix: string) {
+    let cursor = "0";
+    let count = 0;
+    do {
+      const [next, keys] = await this.redis.scan(cursor, { match: `${globEscape(prefix)}*`, count: 1000 });
+      if (keys.length) count += await this.redis.del(...keys);
+      cursor = String(next);
+    } while (cursor !== "0");
     return count;
   }
 }
@@ -191,12 +258,15 @@ let cached: Store | null = null;
 export function getStore(): Store {
   if (cached) return cached;
   const forceFs = process.env.TOERNOOI_STORE === "fs";
-  if (forceFs || !process.env.BLOB_READ_WRITE_TOKEN) {
-    // Op Vercel nooit naar schijf: dat zou stilletjes data kwijtraken.
-    if (process.env.VERCEL) throw new Error("Toernooi-opslag niet ingesteld (BLOB_READ_WRITE_TOKEN ontbreekt).");
-    cached = new FsStore(process.env.TOERNOOI_FS_ROOT ?? join(process.cwd(), ".toernooi-data"));
-  } else {
+  const { KV_REST_API_URL: kvUrl, KV_REST_API_TOKEN: kvToken } = process.env;
+  if (!forceFs && kvUrl && kvToken) {
+    cached = new RedisStore(kvUrl, kvToken);
+  } else if (!forceFs && process.env.BLOB_READ_WRITE_TOKEN) {
     cached = new BlobStore();
+  } else {
+    // Op Vercel nooit naar schijf: dat zou stilletjes data kwijtraken.
+    if (process.env.VERCEL) throw new Error("Toernooi-opslag niet ingesteld (KV_REST_API_URL/TOKEN ontbreken).");
+    cached = new FsStore(process.env.TOERNOOI_FS_ROOT ?? join(process.cwd(), ".toernooi-data"));
   }
   return cached;
 }
