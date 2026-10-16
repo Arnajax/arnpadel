@@ -119,6 +119,7 @@ export default function HomePageClient({
   } | null>(null);
   const [error, setError]           = useState<string | null>(null);
   const [installPromptOpen, setInstallPromptOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const bookingRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
@@ -376,13 +377,12 @@ export default function HomePageClient({
     <div className="page-root">
 
       {/* ── TOPNAV ── (links links · logo midden · CTA rechts) */}
-      <nav className="site-nav">
-        <div className="site-nav-left">
-          <a href="#trainers" className="site-nav-link site-nav-link-desktop">Trainers</a>
+      <nav className={`site-nav${menuOpen ? " site-nav--open" : ""}`}>
+        <div className="site-nav-left" id="site-nav-menu" onClick={() => setMenuOpen(false)}>
+          <a href="#trainers" className="site-nav-link">Trainers</a>
           <a href="/clinics" className="site-nav-link">Clinics</a>
           <a href="/video-analyse" className="site-nav-link">Video-analyse</a>
-          <a href="#rackettest" className="site-nav-link">Rackets testen</a>
-        </div>
+          <a href="#rackettest" className="site-nav-link">Rackets testen</a>        </div>
         <div className="site-nav-brand">
           <img src="/phh-pin.svg" alt="" aria-hidden className="site-nav-logo-img" />
           <span className="site-nav-wordmark">Padel <span className="site-nav-wordmark-hub">Hub</span> Hoorn</span>
@@ -392,6 +392,16 @@ export default function HomePageClient({
             Boek nu →
           </button>
         </div>
+        <button
+          className="site-nav-toggle"
+          aria-expanded={menuOpen}
+          aria-controls="site-nav-menu"
+          aria-label={menuOpen ? "Menu sluiten" : "Menu openen"}
+          onClick={() => setMenuOpen(o => !o)}
+        >
+          <span className="site-nav-toggle-bar" />
+          <span className="site-nav-toggle-bar" />
+        </button>
       </nav>
 
       {/* ── HERO ── */}

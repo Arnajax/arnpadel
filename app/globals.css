@@ -221,43 +221,83 @@ h1, h2, h3, h4,
   border-color: var(--deep-green);
 }
 
+/* Menuknop: alleen op mobiel zichtbaar */
+.site-nav-toggle {
+  display: none;
+}
+
 @media (max-width: 860px) {
+  /* Eén dunne regel: logo links, menuknop rechts. Links klappen eronder uit. */
   .site-nav {
-    grid-template-columns: 1fr;
-    row-gap: 7px;
-    padding: 10px 16px 9px;
+    grid-template-columns: 44px 1fr 44px;
+    padding: 8px;
   }
   .site-nav-cta-wrap {
     display: none;
   }
   .site-nav-brand {
+    grid-row: 1;
+    grid-column: 2;
     justify-self: center;
-    order: -1;
+  }
+  .site-nav-logo-img {
+    height: 20px;
+  }
+  .site-nav-wordmark {
+    font-size: 1.05rem;
+  }
+  .site-nav-toggle {
+    grid-row: 1;
+    grid-column: 3;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .site-nav-toggle-bar {
+    display: block;
+    width: 20px;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform 0.2s ease;
+  }
+  .site-nav--open .site-nav-toggle-bar:first-child {
+    transform: translateY(3.75px) rotate(45deg);
+  }
+  .site-nav--open .site-nav-toggle-bar:last-child {
+    transform: translateY(-3.75px) rotate(-45deg);
   }
   .site-nav-left {
-    justify-self: center;
-    gap: 18px;
-  }
-  /* Trainers staat direct onder de hero — op mobiel niet nodig in de balk */
-  .site-nav-link-desktop {
     display: none;
+    grid-row: 2;
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 6px 8px 4px;
+  }
+  .site-nav--open .site-nav-left {
+    display: flex;
   }
   .site-nav-link {
-    font-size: 0.66rem;
-    letter-spacing: 0.08em;
+    padding: 15px 0;
+    border-top: 1px solid var(--border);
+    font-size: 0.8rem;
   }
 }
 
 #trainers,
 #rackettest {
   scroll-margin-top: 72px;
-}
-
-@media (max-width: 860px) {
-  #trainers,
-  #rackettest {
-    scroll-margin-top: 88px;
-  }
 }
 
 /* ────────────────────────────────────────
@@ -352,24 +392,22 @@ h1, h2, h3, h4,
 
 .hero-cta {
   display: inline-block;
-  background: var(--deep-green);
+  background: var(--court);
   border: none;
-  border-radius: 10px;
-  color: #ffffff;
-  padding: 14px 28px;
-  font-size: 0.88rem;
+  border-radius: 999px;
+  color: var(--cream);
+  padding: 15px 30px;
+  font-size: 1rem;
   font-weight: 700;
-  font-family: var(--font-space-grotesk), system-ui, sans-serif;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  font-family: inherit;
   cursor: pointer;
-  transition: background 0.15s, transform 0.12s;
-  margin: 0 0 12px;
+  transition: background 0.15s, transform 0.15s;
+  margin: 0 0 14px;
 }
 
 .hero-cta:hover {
-  background: var(--court);
-  transform: translateY(-1px);
+  background: var(--deep-green);
+  transform: scale(1.02);
 }
 
 .hero-proof {
@@ -403,10 +441,8 @@ h1, h2, h3, h4,
 
 /* Mobiele overrides — NA de base .site-nav/.hero zodat ze winnen (same-specificity → laatste telt) */
 @media (max-width: 640px) {
-  /* logo gecentreerd (nav-right is hier al verborgen) */
-  .site-nav { justify-content: center; }
   /* hero-overlay breder (minder zij-padding) + lager (kleinere bottom) */
-  .hero { padding: 96px 22px 56px; }
+  .hero { padding: 84px 22px 56px; }
   /* scroll-chevron verbergen op mobile (botst anders met de lager gezette tekst) */
   .hero-scroll { display: none; }
 }
@@ -985,7 +1021,7 @@ h1, h2, h3, h4,
   background: var(--court);
   color: #fff;
   border: none;
-  border-radius: 10px;
+  border-radius: 999px;
   font-size: 1rem;
   font-weight: 700;
   padding: 15px 0;
@@ -1000,7 +1036,7 @@ h1, h2, h3, h4,
   background: var(--court);
   color: #ffffff;
   border: none;
-  border-radius: 12px;
+  border-radius: 999px;
   font-size: 1rem;
   font-weight: 700;
   padding: 16px 28px;
@@ -1620,7 +1656,7 @@ h1, h2, h3, h4,
   text-decoration: none;
   padding: 13px 20px;
   border-radius: 999px;
-  border: 1.5px solid var(--border);
+  border: 1.5px solid oklch(0.43 0.110 152 / 0.35);
   transition: border-color 0.18s, color 0.18s;
 }
 .kobro-cta-secondary:hover {
@@ -1721,8 +1757,8 @@ h1, h2, h3, h4,
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  background: var(--mint);
-  color: var(--ink);
+  background: var(--cream);
+  color: var(--deep-green);
   border-radius: 999px;
   padding: 14px 30px;
   font-size: 0.98rem;
@@ -1731,7 +1767,7 @@ h1, h2, h3, h4,
   transition: transform 0.15s, background 0.18s;
 }
 .community-cta:hover {
-  background: #fff;
+  background: oklch(0.99 0.008 95);
   transform: scale(1.02);
 }
 .community-cta-icon {
