@@ -21,7 +21,7 @@ const REVEAL = [
  * 1. Zacht scrollen (Lenis, alleen muis/trackpad; touch blijft native).
  * 2. Intro: de woorden van de kop schuiven omhoog uit hun regel.
  * 3. Scroll-scène: de hero-video krimpt tot een kaart, de kaderlijn tekent zich,
- *    de tagline komt erin. De hero plakt (CSS sticky) zolang .hero-track duurt.
+ *    de tagline komt erin. Daarna sluit "Kies je trainer" direct aan. De hero plakt (CSS sticky) zolang .hero-track duurt.
  * 4. Reveals: secties komen één keer zacht omhoog.
  * Bij prefers-reduced-motion gebeurt niets en blijft alles statisch zichtbaar.
  */
@@ -38,7 +38,7 @@ export default function Motion() {
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
-    // In-page links (#trainers, #rackettest) via Lenis, met ruimte voor de vaste header.
+    // In-page links (#trainers, #rackettest) via Lenis; ruimte voor de header komt uit scroll-margin-top.
     const onClick = (e: MouseEvent) => {
       const a = (e.target as HTMLElement).closest<HTMLAnchorElement>('a[href^="#"]');
       const id = a?.getAttribute("href");
@@ -46,7 +46,7 @@ export default function Motion() {
       const target = document.querySelector<HTMLElement>(id);
       if (!target) return;
       e.preventDefault();
-      lenis.scrollTo(target, { offset: -72, duration: 1.2 });
+      lenis.scrollTo(target, { duration: 1.2 }); // Lenis houdt zelf rekening met scroll-margin-top
     };
     document.addEventListener("click", onClick);
 
@@ -81,13 +81,9 @@ export default function Motion() {
           .fromTo(".hero-frame-line--b", { scaleX: 0 }, { scaleX: 1, duration: 0.08 }, 0.66)
           .fromTo(".hero-frame-line--l", { scaleY: 0 }, { scaleY: 1, duration: 0.08 }, 0.74)
           .fromTo("[data-frame-label]", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.1 }, 0.78)
-          .fromTo("[data-hero-after]", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.18, stagger: 0.06, ease: "power2.out" }, 0.6)
+          .fromTo("[data-hero-after]", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out" }, 0.6)
           .to({}, { duration: 0.12 }, 0.88);
 
-        // Knop in de tagline pas klikbaar als hij zichtbaar is.
-        tl.eventCallback("onUpdate", () => {
-          hero.classList.toggle("hero--after", tl.progress() > 0.7);
-        });
       });
 
       // 4. Reveals

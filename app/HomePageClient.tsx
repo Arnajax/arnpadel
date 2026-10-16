@@ -445,9 +445,6 @@ export default function HomePageClient({
         </div>
         <div className="hero-after" aria-hidden>
           <p className="hero-after-title" data-hero-after>Het spel zit in de details.</p>
-          <button className="hero-cta" tabIndex={-1} data-hero-after onClick={() => bookingRef.current?.scrollIntoView({ behavior:"smooth" })}>
-            Plan je eerste les →
-          </button>
         </div>
         <button className="hero-scroll" onClick={() => bookingRef.current?.scrollIntoView({ behavior:"smooth" })} aria-label="Scroll naar trainers">
           <ChevronDown/>

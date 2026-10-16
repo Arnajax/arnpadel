@@ -445,7 +445,7 @@ h1, h2, h3, h4,
 .hero {
   --card-t: 92px;
   --card-x: 14vw;
-  --card-b: 27%;
+  --card-b: 19%;
   --card-r: 28px;
   background: var(--cream);
 }
@@ -519,12 +519,10 @@ h1, h2, h3, h4,
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 22px;
   padding: 0 22px;
   text-align: center;
   pointer-events: none;
 }
-.hero--after .hero-after { pointer-events: auto; }
 .hero-after-title {
   margin: 0;
   max-width: 18ch;
@@ -535,13 +533,15 @@ h1, h2, h3, h4,
   letter-spacing: -0.025em;
   color: var(--ink);
 }
-.hero-after .hero-cta { margin: 0; }
+/* Na de scène sluit "Kies je trainer" direct aan */
+.hero-track--anim + .bk-section { padding-top: 0; }
+.hero-track--anim + #trainers { scroll-margin-top: 110px; }
 
 @media (max-width: 767px) {
   .hero {
     --card-t: 76px;
     --card-x: 16px;
-    --card-b: 34%;
+    --card-b: 22%;
     --card-r: 24px;
   }
   .hero-track--anim { height: 250svh; }
