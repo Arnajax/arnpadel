@@ -7,6 +7,7 @@ import { ThinkingOrb } from "thinking-orbs";
 import TrainerShowcase from "./components/TrainerShowcase";
 import TrainerPicker from "./components/TrainerPicker";
 import FloatingBookCTA from "./components/FloatingBookCTA";
+import Motion from "./components/Motion";
 import InstallPrompt from "./components/InstallPrompt";
 import { TRAINERS } from "./_lib/trainers";
 import { PRICE_FROM } from "./_lib/constants";
@@ -405,33 +406,54 @@ export default function HomePageClient({
       </nav>
 
       {/* ── HERO ── */}
-      <section className="hero">
-        <video className="hero-video" autoPlay muted loop playsInline preload="metadata" poster="/hero-poster.jpg">
-          <source src="/hero.webm" type="video/webm"/>
-          <source src="/hero.mp4"  type="video/mp4"/>
-        </video>
-        <div className="hero-overlay" aria-hidden/>
-        <div className="hero-glow"    aria-hidden/>
-        <div className="hero-inner">
-          <div className="hero-badge">
+      {/* Scroll-scène: de hero plakt bovenaan; bij scrollen krimpt de video tot een kaart
+          met de kaderlijn, en verschijnt de tagline. Animatie in components/Motion.tsx. */}
+      <div className="hero-track" data-hero-track>
+      <section className="hero" data-hero>
+        <div className="hero-media" data-hero-media>
+          <video className="hero-video" data-hero-video autoPlay muted loop playsInline preload="metadata" poster="/hero-poster.jpg">
+            <source src="/hero.webm" type="video/webm"/>
+            <source src="/hero.mp4"  type="video/mp4"/>
+          </video>
+          <div className="hero-overlay" data-hero-overlay aria-hidden/>
+          <div className="hero-glow"    aria-hidden/>
+        </div>
+        <div className="hero-frame" aria-hidden>
+          <span className="hero-frame-line hero-frame-line--t" data-frame-line/>
+          <span className="hero-frame-line hero-frame-line--r" data-frame-line/>
+          <span className="hero-frame-line hero-frame-line--b" data-frame-line/>
+          <span className="hero-frame-line hero-frame-line--l" data-frame-line/>
+          <span className="hero-frame-label" data-frame-label>[ Sportcentrum Hoorn ]</span>
+        </div>
+        <div className="hero-inner" data-hero-copy>
+          <div className="hero-badge" data-hero-intro>
             <span className="hero-badge-dot"/>
             Hoorn · Sportcentrum
           </div>
-          <h1 className="hero-title">
-            Boek een les
+          <h1 className="hero-title" aria-label="Boek een les">
+            {["Boek", "een", "les"].map((w) => (
+              <span key={w} className="hero-word" aria-hidden><span data-hero-word>{w}</span></span>
+            ))}
           </h1>
-          <p className="hero-sub">
+          <p className="hero-sub" data-hero-intro>
             Padelles bij Sportcentrum Hoorn, alleen of met maximaal 3 vrienden.
           </p>
-          <button className="hero-cta" onClick={() => bookingRef.current?.scrollIntoView({ behavior:"smooth" })}>
+          <button className="hero-cta" data-hero-intro onClick={() => bookingRef.current?.scrollIntoView({ behavior:"smooth" })}>
             Plan je eerste les →
           </button>
-          <p className="hero-proof">Vanaf {PRICE_FROM} per persoon · Geen abonnement</p>
+          <p className="hero-proof" data-hero-intro>Vanaf {PRICE_FROM} per persoon · Geen abonnement</p>
+        </div>
+        <div className="hero-after" aria-hidden>
+          <p className="hero-after-title" data-hero-after>Het spel zit in de details.</p>
+          <button className="hero-cta" tabIndex={-1} data-hero-after onClick={() => bookingRef.current?.scrollIntoView({ behavior:"smooth" })}>
+            Plan je eerste les →
+          </button>
         </div>
         <button className="hero-scroll" onClick={() => bookingRef.current?.scrollIntoView({ behavior:"smooth" })} aria-label="Scroll naar trainers">
           <ChevronDown/>
         </button>
       </section>
+      </div>
 
       {/* ── BOOKING ── */}
       <section className="bk-section" id="trainers" ref={bookingRef}>
@@ -878,6 +900,7 @@ export default function HomePageClient({
       {!installPromptOpen && (
         <FloatingBookCTA onBook={() => bookingRef.current?.scrollIntoView({ behavior: "smooth" })} />
       )}
+      <Motion />
 
       {/* ── INSTALL PROMPT (alleen homepage) ── */}
       <InstallPrompt

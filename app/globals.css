@@ -24,7 +24,7 @@
 /* ── base ── */
 *, *::before, *::after { box-sizing: border-box; }
 
-html { scroll-behavior: smooth; overflow-x: hidden; }
+html { scroll-behavior: smooth; overflow-x: clip; }
 
 body {
   background: var(--bg);
@@ -32,7 +32,7 @@ body {
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
   margin: 0;
   -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .offline-page {
@@ -438,6 +438,121 @@ h1, h2, h3, h4,
   0%, 100% { transform: translateX(-50%) translateY(0); }
   50% { transform: translateX(-50%) translateY(6px); }
 }
+
+/* ── Hero scroll-scène (components/Motion.tsx) ──
+   Zonder JS of bij reduced motion: gewone hero. Met .hero-track--anim plakt de hero
+   en krimpt de video tot een kaart (maten in --card-*), met kaderlijn en tagline. */
+.hero {
+  --card-t: 92px;
+  --card-x: 14vw;
+  --card-b: 27%;
+  --card-r: 28px;
+  background: var(--cream);
+}
+.hero-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: var(--dark);
+  will-change: clip-path;
+}
+.hero-video { will-change: transform; }
+.hero-track--anim { height: 280svh; }
+.hero-track--anim .hero {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  min-height: 0;
+}
+.hero-word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  padding-bottom: 0.06em;
+}
+.hero-word + .hero-word { margin-left: 0.24em; }
+.hero-word > span { display: inline-block; }
+
+.hero-frame,
+.hero-after { display: none; }
+.hero-track--anim .hero-frame,
+.hero-track--anim .hero-after { display: flex; }
+
+.hero-frame {
+  position: absolute;
+  top: calc(var(--card-t) + 16px);
+  left: calc(var(--card-x) + 16px);
+  right: calc(var(--card-x) + 16px);
+  bottom: calc(var(--card-b) + 16px);
+  z-index: 2;
+  pointer-events: none;
+  color: var(--cream);
+}
+.hero-frame-line {
+  position: absolute;
+  background: currentColor;
+  opacity: 0.6;
+}
+.hero-frame-line--t { top: 0; left: 0; right: 0; height: 1px; transform-origin: left center; }
+.hero-frame-line--r { top: 0; right: 0; bottom: 0; width: 1px; transform-origin: center top; }
+.hero-frame-line--b { bottom: 0; left: 0; right: 0; height: 1px; transform-origin: right center; }
+.hero-frame-line--l { top: 0; bottom: 0; left: 0; width: 1px; transform-origin: center bottom; }
+.hero-frame-label {
+  position: absolute;
+  top: 14px;
+  left: 16px;
+  font-family: var(--font-space-mono), monospace;
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--cream);
+  opacity: 0;
+}
+
+.hero-after {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--card-b);
+  z-index: 2;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 0 22px;
+  text-align: center;
+  pointer-events: none;
+}
+.hero--after .hero-after { pointer-events: auto; }
+.hero-after-title {
+  margin: 0;
+  max-width: 18ch;
+  font-family: var(--font-space-grotesk), system-ui, sans-serif;
+  font-size: clamp(1.75rem, 3.4vw, 3rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+.hero-after .hero-cta { margin: 0; }
+
+@media (max-width: 767px) {
+  .hero {
+    --card-t: 76px;
+    --card-x: 16px;
+    --card-b: 34%;
+    --card-r: 24px;
+  }
+  .hero-track--anim { height: 250svh; }
+  .hero-after-title { font-size: 1.85rem; max-width: 14ch; }
+}
+
+/* Lenis (zacht scrollen) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
 
 /* Mobiele overrides — NA de base .site-nav/.hero zodat ze winnen (same-specificity → laatste telt) */
 @media (max-width: 640px) {
