@@ -423,7 +423,6 @@ export default function HomePageClient({
           <span className="hero-frame-line hero-frame-line--r" data-frame-line/>
           <span className="hero-frame-line hero-frame-line--b" data-frame-line/>
           <span className="hero-frame-line hero-frame-line--l" data-frame-line/>
-          <span className="hero-frame-label" data-frame-label>[ Sportcentrum Hoorn ]</span>
         </div>
         <div className="hero-inner" data-hero-copy>
           <div className="hero-badge" data-hero-intro>

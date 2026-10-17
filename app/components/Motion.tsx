@@ -80,7 +80,6 @@ export default function Motion() {
           .fromTo(".hero-frame-line--r", { scaleY: 0 }, { scaleY: 1, duration: 0.08 }, 0.58)
           .fromTo(".hero-frame-line--b", { scaleX: 0 }, { scaleX: 1, duration: 0.08 }, 0.66)
           .fromTo(".hero-frame-line--l", { scaleY: 0 }, { scaleY: 1, duration: 0.08 }, 0.74)
-          .fromTo("[data-frame-label]", { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.1 }, 0.78)
           .fromTo("[data-hero-after]", { opacity: 0, y: 36 }, { opacity: 1, y: 0, duration: 0.18, ease: "power2.out" }, 0.6)
           .to({}, { duration: 0.12 }, 0.88);
 

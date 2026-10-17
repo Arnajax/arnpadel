@@ -497,17 +497,6 @@ h1, h2, h3, h4,
 .hero-frame-line--r { top: 0; right: 0; bottom: 0; width: 1px; transform-origin: center top; }
 .hero-frame-line--b { bottom: 0; left: 0; right: 0; height: 1px; transform-origin: right center; }
 .hero-frame-line--l { top: 0; bottom: 0; left: 0; width: 1px; transform-origin: center bottom; }
-.hero-frame-label {
-  position: absolute;
-  top: 14px;
-  left: 16px;
-  font-family: var(--font-space-mono), monospace;
-  font-size: 0.68rem;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--cream);
-  opacity: 0;
-}
 
 .hero-after {
   position: absolute;
