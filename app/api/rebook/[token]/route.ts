@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
+import { VPS_BASE_URL } from '../../../_lib/vps'
 
-// Proxy naar de VPS (http) — de site is https, dus client mag de VPS niet direct callen.
+// Proxy naar de VPS-API: de browser roept de VPS niet zelf aan.
 export async function POST(
   _req: Request,
   { params }: { params: Promise<{ token: string }> }
@@ -8,7 +9,7 @@ export async function POST(
   const { token } = await params
   try {
     const vpsRes = await fetch(
-      `http://89.167.75.216:5077/rebook-confirm/${encodeURIComponent(token)}`,
+      `${VPS_BASE_URL}/rebook-confirm/${encodeURIComponent(token)}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

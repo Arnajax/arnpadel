@@ -1,11 +1,12 @@
 import RebookClient, { type RebookInfo } from "./RebookClient";
+import { VPS_BASE_URL } from "../../_lib/vps";
 
 export const dynamic = "force-dynamic";
 
 async function fetchInfo(token: string): Promise<RebookInfo | null> {
   try {
     const res = await fetch(
-      `http://89.167.75.216:5077/rebook-info/${encodeURIComponent(token)}`,
+      `${VPS_BASE_URL}/rebook-info/${encodeURIComponent(token)}`,
       { cache: "no-store" },
     );
     return (await res.json()) as RebookInfo;

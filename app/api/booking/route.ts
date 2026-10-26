@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { VPS_BASE_URL } from '../../_lib/vps'
 
 export async function POST(req: Request) {
   const { name, phone, players, slotIds, trainerId } = await req.json()
@@ -9,7 +10,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const vpsRes = await fetch('http://89.167.75.216:5077/booking-batch', {
+    const vpsRes = await fetch(`${VPS_BASE_URL}/booking-batch`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

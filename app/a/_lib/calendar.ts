@@ -1,4 +1,4 @@
-const VPS_BASE_URL = "http://89.167.75.216:5077";
+import { VPS_BASE_URL } from "../../_lib/vps";
 
 export interface CalendarBookingPayload {
   token: string;

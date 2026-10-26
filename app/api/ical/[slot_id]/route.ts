@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server'
+import { VPS_BASE_URL } from '../../../_lib/vps'
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ slot_id: string }> }
 ) {
   const { slot_id } = await params
-  const vpsRes = await fetch(`http://89.167.75.216:5077/ical/${slot_id}`)
+  const vpsRes = await fetch(`${VPS_BASE_URL}/ical/${slot_id}`)
 
   if (!vpsRes.ok) {
     return NextResponse.json({ error: 'Slot niet gevonden' }, { status: 404 })

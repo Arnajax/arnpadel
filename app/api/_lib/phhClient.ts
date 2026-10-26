@@ -1,6 +1,7 @@
 import crypto from "node:crypto";
+import { VPS_BASE_URL } from "../../_lib/vps";
 
-const VPS_URL = process.env.PHH_VPS_URL ?? "http://89.167.75.216:5077";
+const VPS_URL = VPS_BASE_URL;
 const SECRET = process.env.PHH_SHARED_SECRET ?? "";
 
 export type ForwardResult =
