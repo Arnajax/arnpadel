@@ -888,7 +888,7 @@ export default function HomePageClient({
           </div>
         </div>
         <div className="footer-bottom">
-          <p className="footer-copy">© {new Date().getFullYear()} Padel Hub Hoorn</p>
+          <p className="footer-copy">© {new Date().getFullYear()} Padel Hub Hoorn · Gemaakt door <a href="https://aicompagnie.com" className="footer-link">AI Compagnie</a></p>
         </div>
       </footer>
 
