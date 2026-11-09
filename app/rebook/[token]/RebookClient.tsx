@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 
 export type RebookInfo = {
@@ -62,7 +63,7 @@ export default function RebookClient({ token, info }: { token: string; info: Reb
       <Shell>
         <h1 style={h1}>Link werkt niet</h1>
         <p style={sub}>{info?.error ?? "Deze rebook-link is ongeldig of verlopen."}</p>
-        <a href="/" style={secondaryBtn}>Naar de site →</a>
+        <Link href="/" style={secondaryBtn}>Naar de site →</Link>
       </Shell>
     );
   }

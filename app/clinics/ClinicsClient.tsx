@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { canonicalPhone, formatPhone, phoneError } from "../_lib/phone";
 
@@ -113,9 +114,9 @@ export default function ClinicsClient() {
           {(extras.borrel || extras.diner) ? " Borrel, hapjes of diner stemmen we erbij af in de offerte." : ""}
           {" "}De definitieve prijs stemmen we samen af.
         </p>
-        <a href="/" className="btn-primary" style={{ marginTop: 24, display: "inline-block" }}>
+        <Link href="/" className="btn-primary" style={{ marginTop: 24, display: "inline-block" }}>
           Terug naar home
-        </a>
+        </Link>
       </div>
     );
   }
