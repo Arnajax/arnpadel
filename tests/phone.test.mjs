@@ -58,12 +58,23 @@ test("pariteit met canonical_phone() in padel_booking.py", async (t) => {
   }
   assert.equal(python, "1");
 
-  const src = await readFile(
-    new URL("../padel-booking/padel_booking_vps.py", import.meta.url),
-    "utf8",
-  );
-  const match = src.match(/^def canonical_phone\(raw: str\):[\s\S]*?\n(?=\S)/m);
-  assert.ok(match, "canonical_phone() niet gevonden in padel_booking_vps.py");
+  // De kopie in tests/fixtures staat in git (GitHub-check). Het volledige VPS-bestand staat
+  // alleen lokaal (er zit een sleutel in); is het er, dan moet de kopie er exact gelijk aan zijn.
+  const FN = /^def canonical_phone\(raw: str\):[\s\S]*?\n(?=\S)/m;
+  const kopie = (await readFile(new URL("./fixtures/canonical_phone_vps.py", import.meta.url), "utf8")).match(FN);
+  assert.ok(kopie, "canonical_phone() niet gevonden in tests/fixtures/canonical_phone_vps.py");
+  let vps = null;
+  try {
+    vps = await readFile(new URL("../padel-booking/padel_booking_vps.py", import.meta.url), "utf8");
+  } catch {
+    // Niet aanwezig (GitHub): de kopie is de bron.
+  }
+  if (vps !== null) {
+    const live = vps.match(FN);
+    assert.ok(live, "canonical_phone() niet gevonden in padel_booking_vps.py");
+    assert.equal(kopie[0], live[0], "tests/fixtures/canonical_phone_vps.py loopt achter op padel_booking_vps.py");
+  }
+  const match = kopie;
 
   const script = `import re, json, sys\n${match[0]}\ncases = json.loads(sys.argv[1])\nprint(json.dumps([canonical_phone(c) for c in cases]))`;
   const inputs = CASES.map(([input]) => input);
