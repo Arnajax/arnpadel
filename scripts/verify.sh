@@ -4,7 +4,8 @@
 # Bron van waarheid voor de lokale loop-harness: ~/.claude/skills/loop-engineering/templates/verify.sh
 # (de cheat-guard flagt elke diff aan dit bestand zodat de twee niet ongemerkt uiteenlopen).
 #
-# Harde gates: lint, build (type-gate), tests. npm audit = advisory (geen blocker, nooit auto-fix).
+# Harde gates: lint, build (type-gate), tests, e2e. npm audit = advisory (geen blocker, nooit auto-fix).
+# Afwijking van de template: de e2e-gate (klik-test boeken, tests/e2e) staat alleen in deze kopie.
 # Gebruik: scripts/verify.sh [REPO_DIR]   (default: $PWD)
 # Laatste stdout-regel is machine-leesbaar: "VERIFY: PASS" of "VERIFY: FAIL gate=<naam>".
 set -uo pipefail
@@ -17,6 +18,7 @@ fail() { echo "VERIFY: FAIL gate=$1"; exit 1; }
 echo "▶ lint";  npm run lint --silent           || fail lint
 echo "▶ build"; npm run build                    || fail build
 echo "▶ test";  node --test tests/*.mjs          || fail test
+echo "▶ e2e";   npm run test:e2e --silent       || fail e2e
 
 echo "▶ audit (advisory)"
 npm audit --omit=dev || echo "  ⚠ audit findings — handmatig beoordelen (geen blocker)"
