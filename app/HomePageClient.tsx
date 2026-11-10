@@ -1,13 +1,17 @@
 "use client";
 
+import Link from "next/link";
 import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ThinkingOrb } from "thinking-orbs";
 import TrainerShowcase from "./components/TrainerShowcase";
 import TrainerPicker from "./components/TrainerPicker";
 import FloatingBookCTA from "./components/FloatingBookCTA";
+import Motion from "./components/Motion";
 import InstallPrompt from "./components/InstallPrompt";
 import { TRAINERS } from "./_lib/trainers";
 import { PRICE_FROM } from "./_lib/constants";
+import { canonicalPhone, formatPhone, phoneError } from "./_lib/phone";
 import type { Slot } from "./_lib/slots";
 
 interface FormData {
@@ -100,6 +104,11 @@ export default function HomePageClient({
   const [viewMonth, setViewMonth]   = useState(new Date().getMonth());
   const [formData, setFormData]     = useState<FormData>({ name: "", phone: "", players: 2 });
   const [playersSelected, setPlayersSelected] = useState(false);
+  // Telefoon is het enige kanaal waarop we de leerling kunnen bereiken — een typefout
+  // betekent een les die niemand komt spelen. Live valideren + het genormaliseerde
+  // nummer terugtonen, zodat de klant zijn eigen fout ziet vóór hij bevestigt.
+  const phoneCanon = useMemo(() => canonicalPhone(formData.phone), [formData.phone]);
+  const phoneIssue = useMemo(() => phoneError(formData.phone), [formData.phone]);
   const [submitting, setSubmitting] = useState(false);
   const [successData, setSuccessData] = useState<{
     name: string;
@@ -111,10 +120,12 @@ export default function HomePageClient({
   } | null>(null);
   const [error, setError]           = useState<string | null>(null);
   const [installPromptOpen, setInstallPromptOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const bookingRef = useRef<HTMLDivElement>(null);
   const calendarRef = useRef<HTMLDivElement>(null);
   const formRef    = useRef<HTMLDivElement>(null);
+  const successRef = useRef<HTMLDivElement>(null);
   const hasScrolledToForm = useRef(false);
 
   useEffect(() => {
@@ -143,6 +154,16 @@ export default function HomePageClient({
     }
   }, [formData.name, formData.phone]);
 
+  // Deep-link vanuit de rebook-landingspagina: ?trainer=<id> → trainer voorselecteren
+  // (de bestaande selectedTrainer-effect scrollt dan vanzelf naar de kalender)
+  useEffect(() => {
+    const t = new URLSearchParams(window.location.search).get("trainer");
+    if (t && TRAINERS.some((x) => x.id === t)) {
+      handleSelectTrainer(t);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Slots gefilterd op geselecteerde trainer
   const filteredSlots = useMemo(() => {
     if (!selectedTrainer) return slots;
@@ -164,6 +185,15 @@ export default function HomePageClient({
       setTimeout(() => calendarRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
     }
   }, [selectedTrainer]);
+
+  // Na een geslaagde boeking: scroll het successcherm in beeld (anders krimpt de
+  // pagina en blijft de scroll-offset op de Kobro-sectie hangen)
+  useEffect(() => {
+    if (!successData) return;
+    requestAnimationFrame(() =>
+      successRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+    );
+  }, [successData]);
 
   // Auto-scroll naar form alleen bij eerste slot in cart (niet bij elke toevoeging)
   useEffect(() => {
@@ -285,6 +315,7 @@ export default function HomePageClient({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (selectedSlotIds.size === 0) { setError("Selecteer eerst minstens één tijdslot."); return; }
+    if (!phoneCanon) { setError(phoneError(formData.phone) ?? "Vul je 06-nummer in."); return; }
     setSubmitting(true);
     setError(null);
     try {
@@ -294,7 +325,7 @@ export default function HomePageClient({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
-          phone: formData.phone,
+          phone: phoneCanon,
           players: formData.players,
           slotIds,
           trainerId: selectedTrainer ?? "arn",
@@ -346,49 +377,79 @@ export default function HomePageClient({
   return (
     <div className="page-root">
 
-      {/* ── TOPNAV ── */}
-      <nav className="site-nav">
+      {/* ── TOPNAV ── (links links · logo midden · CTA rechts) */}
+      <nav className={`site-nav${menuOpen ? " site-nav--open" : ""}`}>
+        <div className="site-nav-left" id="site-nav-menu" onClick={() => setMenuOpen(false)}>
+          <a href="#trainers" className="site-nav-link">Trainers</a>
+          <a href="/clinics" className="site-nav-link">Clinics</a>
+          <a href="/video-analyse" className="site-nav-link">Video-analyse</a>
+          <a href="#rackettest" className="site-nav-link">Rackets testen</a>        </div>
         <div className="site-nav-brand">
           <img src="/phh-pin.svg" alt="" aria-hidden className="site-nav-logo-img" />
           <span className="site-nav-wordmark">Padel <span className="site-nav-wordmark-hub">Hub</span> Hoorn</span>
         </div>
-        <div className="site-nav-right">
-          <a href="#trainers" className="site-nav-link">Trainers</a>
-          <a href="#rackettest" className="site-nav-link">Rackets testen</a>
+        <div className="site-nav-cta-wrap">
           <button className="site-nav-cta" onClick={() => bookingRef.current?.scrollIntoView({ behavior: "smooth" })}>
             Boek nu →
           </button>
         </div>
+        <button
+          className="site-nav-toggle"
+          aria-expanded={menuOpen}
+          aria-controls="site-nav-menu"
+          aria-label={menuOpen ? "Menu sluiten" : "Menu openen"}
+          onClick={() => setMenuOpen(o => !o)}
+        >
+          <span className="site-nav-toggle-bar" />
+          <span className="site-nav-toggle-bar" />
+        </button>
       </nav>
 
       {/* ── HERO ── */}
-      <section className="hero">
-        <video className="hero-video" autoPlay muted loop playsInline preload="metadata" poster="/hero-poster.jpg">
-          <source src="/hero.webm" type="video/webm"/>
-          <source src="/hero.mp4"  type="video/mp4"/>
-        </video>
-        <div className="hero-overlay" aria-hidden/>
-        <div className="hero-glow"    aria-hidden/>
-        <div className="hero-inner">
-          <div className="hero-badge">
+      {/* Scroll-scène: de hero plakt bovenaan; bij scrollen krimpt de video tot een kaart
+          met de kaderlijn, en verschijnt de tagline. Animatie in components/Motion.tsx. */}
+      <div className="hero-track" data-hero-track>
+      <section className="hero" data-hero>
+        <div className="hero-media" data-hero-media>
+          <video className="hero-video" data-hero-video autoPlay muted loop playsInline preload="metadata" poster="/hero-poster.jpg">
+            <source src="/hero.webm" type="video/webm"/>
+            <source src="/hero.mp4"  type="video/mp4"/>
+          </video>
+          <div className="hero-overlay" data-hero-overlay aria-hidden/>
+          <div className="hero-glow"    aria-hidden/>
+        </div>
+        <div className="hero-frame" aria-hidden>
+          <span className="hero-frame-line hero-frame-line--t" data-frame-line/>
+          <span className="hero-frame-line hero-frame-line--r" data-frame-line/>
+          <span className="hero-frame-line hero-frame-line--b" data-frame-line/>
+          <span className="hero-frame-line hero-frame-line--l" data-frame-line/>
+        </div>
+        <div className="hero-inner" data-hero-copy>
+          <div className="hero-badge" data-hero-intro>
             <span className="hero-badge-dot"/>
             Hoorn · Sportcentrum
           </div>
-          <h1 className="hero-title">
-            Boek een les
+          <h1 className="hero-title" aria-label="Boek een les">
+            {["Boek", "een", "les"].map((w) => (
+              <span key={w} className="hero-word" aria-hidden><span data-hero-word>{w}</span></span>
+            ))}
           </h1>
-          <p className="hero-sub">
+          <p className="hero-sub" data-hero-intro>
             Padelles bij Sportcentrum Hoorn, alleen of met maximaal 3 vrienden.
           </p>
-          <button className="hero-cta" onClick={() => bookingRef.current?.scrollIntoView({ behavior:"smooth" })}>
+          <button className="hero-cta" data-hero-intro onClick={() => bookingRef.current?.scrollIntoView({ behavior:"smooth" })}>
             Plan je eerste les →
           </button>
-          <p className="hero-proof">Vanaf {PRICE_FROM} per persoon · Geen abonnement</p>
+          <p className="hero-proof" data-hero-intro>Vanaf {PRICE_FROM} per persoon · Geen abonnement</p>
+        </div>
+        <div className="hero-after" aria-hidden>
+          <p className="hero-after-title" data-hero-after>Het spel zit in de details.</p>
         </div>
         <button className="hero-scroll" onClick={() => bookingRef.current?.scrollIntoView({ behavior:"smooth" })} aria-label="Scroll naar trainers">
           <ChevronDown/>
         </button>
       </section>
+      </div>
 
       {/* ── BOOKING ── */}
       <section className="bk-section" id="trainers" ref={bookingRef}>
@@ -434,7 +495,7 @@ export default function HomePageClient({
                     Geen beschikbare lessen bij {selectedTrainerData?.name ?? "deze trainer"} — check later opnieuw of kies een andere trainer.
                   </div>
                 ) : successData ? (
-                  <div className="success-block">
+                  <div className="success-block" ref={successRef}>
                     <CheckCircle/>
                     <h3 className="success-title">Aanvraag verzonden! 🎾</h3>
                     <p className="success-sub">
@@ -636,14 +697,25 @@ export default function HomePageClient({
                                   <label className="field-label" htmlFor="bk-phone">Telefoon</label>
                                   <input
                                     id="bk-phone" type="tel" required
-                                    className="field-input" placeholder="06 12 34 56 78"
+                                    inputMode="tel" autoComplete="tel"
+                                    aria-invalid={phoneIssue ? true : undefined}
+                                    aria-describedby="bk-phone-hint"
+                                    className={`field-input${phoneIssue ? " field-input--invalid" : ""}`}
+                                    placeholder="06 12 34 56 78"
                                     value={formData.phone}
                                     onChange={e => setFormData(f => ({ ...f, phone: e.target.value }))}
                                   />
+                                  <p id="bk-phone-hint" className={`phone-hint${phoneIssue ? " phone-hint--error" : ""}`} aria-live="polite">
+                                    {phoneIssue
+                                      ? phoneIssue
+                                      : phoneCanon
+                                        ? <>We appen je op <strong>{formatPhone(phoneCanon)}</strong></>
+                                        : "Hier sturen we je bevestiging naartoe via WhatsApp."}
+                                  </p>
                                 </div>
-                                <button type="submit" disabled={submitting} className="btn-confirm">
+                                <button type="submit" disabled={submitting || !phoneCanon} className="btn-confirm">
                                   {submitting
-                                    ? <span className="spinner-row"><span className="spinner"/>Versturen…</span>
+                                    ? <span className="spinner-row"><ThinkingOrb state="composing" size={20} theme="dark" aria-label="Boeking versturen…" />Versturen…</span>
                                     : cartSlots.length === 1
                                       ? "Bevestig boeking"
                                       : `Bevestig boeking (${cartSlots.length} lessen · €${totalPrice})`}
@@ -740,6 +812,46 @@ export default function HomePageClient({
       {/* ── ABOUT ── */}
       <TrainerShowcase trainers={TRAINERS} />
 
+      {/* ── COMMUNITY (WhatsApp spelersgroep) ── */}
+      <section className="community-section" aria-label="Word lid van de Padel Hub Hoorn community">
+        <div className="community-inner">
+          <span className="community-eyebrow">Community</span>
+          <h2 className="community-heading">Word lid van de Padel Hub community</h2>
+          <p className="community-body">
+            Vind maatjes op jouw niveau, regel potjes en blijf als eerste op de hoogte van clinics, events en toernooien. Gratis voor iedereen die bij Padel Hub Hoorn speelt.
+          </p>
+          <a
+            className="community-cta"
+            href="https://chat.whatsapp.com/G7XrXSZWKlI7YIUheYWf1g"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <svg className="community-cta-icon" viewBox="0 0 24 24" width="20" height="20" aria-hidden>
+              <path fill="currentColor" d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38c1.45.79 3.08 1.21 4.79 1.21h.01c5.46 0 9.91-4.45 9.91-9.91C21.96 6.45 17.5 2 12.04 2zm0 18.15h-.01c-1.52 0-3.01-.41-4.3-1.18l-.31-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.35c0-4.54 3.7-8.23 8.24-8.23 2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.69 8.23-8.24 8.23zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.12-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.12-1.05-.39-1.99-1.23-.74-.66-1.23-1.47-1.38-1.72-.14-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.12-.14.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.12-.56-1.34-.76-1.84-.2-.48-.4-.42-.56-.43-.14-.01-.31-.01-.48-.01-.17 0-.43.06-.66.31-.23.25-.87.85-.87 2.07 0 1.22.89 2.4 1.02 2.56.12.17 1.75 2.67 4.23 3.74.59.26 1.05.41 1.41.52.59.19 1.13.16 1.56.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.14-1.18-.06-.11-.23-.17-.48-.29z"/>
+            </svg>
+            Word lid via WhatsApp
+          </a>
+          <p className="community-note">Spelersgroep · potjes &amp; maatjes · niveaugroepen</p>
+          <Link href="/toernooi" className="community-secondary">Organiseer je een toernooitje? Zet het hier klaar →</Link>
+        </div>
+      </section>
+
+      {/* ── IN HERINNERING (Stephan Horden) ── */}
+      <section className="memoriam-section" aria-label="In herinnering aan Stephan Horden">
+        <div className="memoriam-inner">
+          <img src="/stephan-photo.jpg" alt="Stephan Horden" className="memoriam-photo" />
+          <p className="memoriam-eyebrow">In herinnering</p>
+          <h2 className="memoriam-name">Stephan Horden</h2>
+          <p className="memoriam-body">
+            Stephan was een bekend gezicht op de banen in Hoorn, maar nog bekender was zijn mooie grote en vooral witte lach. Als hij binnenkwam voelde je de positieve, vrolijke en enthousiaste energie de ruimte in komen.
+          </p>
+          <p className="memoriam-body">
+            Hij was fanatiek, altijd in voor een potje, en iemand die van padel een familiesport maakte: zijn zoon stond net zo graag op de baan als hij.
+          </p>
+          <p className="memoriam-close">We zullen hem voor altijd missen ❤️</p>
+        </div>
+      </section>
+
       {/* ── FOOTER ── */}
       <footer className="site-footer">
         <div className="footer-grid">
@@ -751,12 +863,12 @@ export default function HomePageClient({
             </ul>
           </div>
           <div className="footer-col">
-            <h4 className="footer-col-head">Lessen</h4>
+            <h4 className="footer-col-head">Aanbod</h4>
             <ul className="footer-col-list">
-              <li>Privé (1 persoon)</li>
-              <li>Duo (2 personen)</li>
-              <li>Trio (3 personen)</li>
-              <li>4 personen</li>
+              <li>Privélessen (1 tot 4 personen)</li>
+              <li><a href="/clinics" className="footer-link">Clinics &amp; bedrijfsuitjes</a></li>
+              <li><a href="/video-analyse" className="footer-link">Video-analyse</a></li>
+              <li><Link href="/toernooi" className="footer-link">Toernooitje organiseren</Link></li>
             </ul>
           </div>
           <div className="footer-col">
@@ -771,12 +883,12 @@ export default function HomePageClient({
             <h4 className="footer-col-head">Juridisch</h4>
             <ul className="footer-col-list">
               <li><a href="/voorwaarden" className="footer-link">Annulering &amp; voorwaarden</a></li>
-              <li><a href="/voorwaarden" className="footer-link">Privacy</a></li>
+              <li><a href="/voorwaarden#privacy" className="footer-link">Privacy</a></li>
             </ul>
           </div>
         </div>
         <div className="footer-bottom">
-          <p className="footer-copy">© {new Date().getFullYear()} Padel Hub Hoorn</p>
+          <p className="footer-copy">© {new Date().getFullYear()} Padel Hub Hoorn · Gemaakt door <a href="https://aicompagnie.com" className="footer-link">AI Compagnie</a></p>
         </div>
       </footer>
 
@@ -784,6 +896,7 @@ export default function HomePageClient({
       {!installPromptOpen && (
         <FloatingBookCTA onBook={() => bookingRef.current?.scrollIntoView({ behavior: "smooth" })} />
       )}
+      <Motion />
 
       {/* ── INSTALL PROMPT (alleen homepage) ── */}
       <InstallPrompt

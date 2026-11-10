@@ -1,4 +1,6 @@
-const VPS_SLOTS_URL = "http://89.167.75.216:5077/slots";
+import { VPS_BASE_URL } from "./vps";
+
+const VPS_SLOTS_URL = `${VPS_BASE_URL}/slots`;
 const SLOTS_TTL_MS = 30_000;
 
 interface VpsSlot {

@@ -48,3 +48,6 @@ next-env.d.ts
 
 # backup of original (uncompressed) media — local only, do not deploy
 /.media-originals/
+
+# lokale opslag van de toernooitool (alleen voor ontwikkelen/testen)
+/.toernooi-data/
