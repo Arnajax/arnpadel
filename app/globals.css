@@ -697,7 +697,9 @@ html.lenis, html.lenis body { height: auto; }
 /* Calendar panel: geen eigen border (cal-reveal regelt het), overflow clip voor ronde hoeken */
 .cal-trainer-bar + div > .bk-layout,
 .cal-trainer-bar + div > .empty-state,
-.cal-trainer-bar + div > .success-block {
+.cal-trainer-bar + div > .success-block,
+.cal-trainer-bar + div > .golf,
+.golf .bk-layout {
   border: none;
   border-radius: 0 0 24px 24px;
   overflow: hidden;
@@ -2522,4 +2524,19 @@ html.lenis, html.lenis body { height: auto; }
   .cl-section { padding: 56px 20px; }
   .cl-trainers { gap: 24px; }
   .cl-cta-primary, .cl-cta-ghost { flex: 1; text-align: center; }
+}
+
+/* De golf van de bevestigknop naar het successcherm (Arn, 19 nov 2026: libraries.dev/waves).
+   Beide schermen liggen in één vak op de crème ondergrond. */
+.golf,
+.golf-succes {
+  background: #fff;
+}
+.golf-succes { height: 100%; }
+
+/* Het pakket maakt een foto van het vak voor de golf en neemt Tailwinds "rand zonder dikte"
+   (border: 0 solid) niet goed mee: op de foto wordt dat een rand van 3px om elk element.
+   Binnen de golf daarom geen rand, behalve waar een eigen regel er een zet. */
+@layer base {
+  .golf :where(*), .golf :where(*)::before, .golf :where(*)::after { border-style: none; }
 }
