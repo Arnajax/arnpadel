@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, useMemo } from "react";
+import { DistortionWave } from "distortion-waves";
 import { motion, AnimatePresence } from "framer-motion";
 import { ThinkingOrb } from "thinking-orbs";
 import TrainerShowcase from "./components/TrainerShowcase";
@@ -126,6 +127,12 @@ export default function HomePageClient({
   const calendarRef = useRef<HTMLDivElement>(null);
   const formRef    = useRef<HTMLDivElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
+  // De golf naar het successcherm (Arn, 19 nov 2026)
+  const submitRef = useRef<HTMLButtonElement>(null);
+  const layoutRef = useRef<HTMLDivElement>(null);
+  const [succesTop, setSuccesTop] = useState(0);
+  const [golfRustig, setGolfRustig] = useState(false);
+  const succesWas = useRef<number | null>(null);
   const hasScrolledToForm = useRef(false);
 
   useEffect(() => {
@@ -186,14 +193,13 @@ export default function HomePageClient({
     }
   }, [selectedTrainer]);
 
-  // Na een geslaagde boeking: scroll het successcherm in beeld (anders krimpt de
-  // pagina en blijft de scroll-offset op de Kobro-sectie hangen)
-  useEffect(() => {
-    if (!successData) return;
-    requestAnimationFrame(() =>
-      successRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-    );
-  }, [successData]);
+  // Na de golf krimpt het vak tot alleen het successcherm: houd dat scherm op dezelfde
+  // plek in beeld (anders blijft de scroll-offset op de Kobro-sectie hangen)
+  useLayoutEffect(() => {
+    if (!golfRustig || succesWas.current === null || !successRef.current) return;
+    window.scrollBy({ top: successRef.current.getBoundingClientRect().top - succesWas.current, behavior: "instant" });
+    succesWas.current = null;
+  }, [golfRustig]);
 
   // Auto-scroll naar form alleen bij eerste slot in cart (niet bij elke toevoeging)
   useEffect(() => {
@@ -296,6 +302,7 @@ export default function HomePageClient({
     setSelectedSlotIds(new Set());
     setError(null);
     setSuccessData(null);
+    setGolfRustig(false);
   }
   function handleBackToTrainers() {
     setSelectedTrainer(null);
@@ -307,6 +314,7 @@ export default function HomePageClient({
   function handleBookMore() {
     // Behoud trainer + datum, wis selectie + success
     setSuccessData(null);
+    setGolfRustig(false);
     setSelectedSlotIds(new Set());
     setError(null);
     setTimeout(() => calendarRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
@@ -360,10 +368,10 @@ export default function HomePageClient({
         total: bookedSlots.reduce((sum, s) => sum + getPrice(formData.players, getTime(s), s.date), 0),
         trainerName: trainer.name,
       });
-      setFormData((current) => ({ ...current, players: 2 }));
-      setPlayersSelected(false);
-      setSelectedSlotIds(new Set());
-      setSelectedDate(null);
+      // Het successcherm bovenaan wat je ziet zetten, niet onder de balk bovenin (de selectie wist onFinish van de golf)
+      const vak = layoutRef.current?.getBoundingClientRect();
+      const kop = document.querySelector("nav")?.getBoundingClientRect().bottom ?? 0;
+      if (vak) setSuccesTop(Math.max(0, kop + 16 - vak.top));
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Er is iets misgegaan.");
     } finally {
@@ -494,7 +502,7 @@ export default function HomePageClient({
                   <div className="empty-state">
                     Geen beschikbare lessen bij {selectedTrainerData?.name ?? "deze trainer"} — check later opnieuw of kies een andere trainer.
                   </div>
-                ) : successData ? (
+                  ) : successData && golfRustig ? (
                   <div className="success-block" ref={successRef}>
                     <CheckCircle/>
                     <h3 className="success-title">Aanvraag verzonden! 🎾</h3>
@@ -551,7 +559,85 @@ export default function HomePageClient({
                       Nog meer slots boeken
                     </button>
                   </div>
-                ) : (
+                  ) : (
+                    /* De boeking gaat met een golf vanaf de bevestigknop over in het successcherm
+                       (Arn, 19 nov 2026: libraries.dev/waves). Met minder beweging: een overvloeier. */
+                    <DistortionWave
+                      className="golf"
+                      revealed={!!successData}
+                      source={submitRef}
+                      type="vertical"
+                      palette="green"
+                      revealedContent={successData ? <div className="golf-succes" style={{ paddingTop: succesTop }}>
+                    <div className="success-block" ref={successRef}>
+                      <CheckCircle/>
+                      <h3 className="success-title">Aanvraag verzonden! 🎾</h3>
+                      <p className="success-sub">
+                        {successData.bookedSlots.length === 1
+                          ? `Je aanvraag is ontvangen. ${successData.trainerName.split(" ")[0]} neemt zo spoedig mogelijk contact op via WhatsApp.`
+                          : `Je ${successData.bookedSlots.length} aanvragen zijn ontvangen. ${successData.trainerName.split(" ")[0]} neemt zo spoedig mogelijk contact op via WhatsApp.`}
+                      </p>
+                      <div className="success-card">
+                        <div className="success-card-row">
+                          <span className="success-card-label">Naam</span>
+                          <span className="success-card-value">{successData.name}</span>
+                        </div>
+                        <div className="success-card-row">
+                          <span className="success-card-label">Trainer</span>
+                          <span className="success-card-value">{successData.trainerName}</span>
+                        </div>
+                        <div className="success-card-row">
+                          <span className="success-card-label">Spelers</span>
+                          <span className="success-card-value">{successData.players}</span>
+                        </div>
+                        <div className="success-card-row" style={{ alignItems: "flex-start" }}>
+                          <span className="success-card-label">{successData.bookedSlots.length === 1 ? "Slot" : `Slots (${successData.bookedSlots.length})`}</span>
+                          <span className="success-card-value" style={{ textAlign: "right" }}>
+                            {successData.bookedSlots.map((s) => {
+                              const t = getTime(s);
+                              const p = getPrice(successData.players, t, s.date);
+                              return (
+                                <span key={s.id} style={{ display: "block" }}>
+                                  ✅ {DAY_FULL_NL[parseDateLocal(slotDateKey(s.date)).getDay()]}{" "}
+                                  {parseDateLocal(slotDateKey(s.date)).getDate()}{" "}
+                                  {MONTH_SHORT_NL[parseDateLocal(slotDateKey(s.date)).getMonth()]} · {t}
+                                  {successData.bookedSlots.length > 1 && <> — €{p}</>}
+                                </span>
+                              );
+                            })}
+                            {successData.failedSlots.map((f, i) => (
+                              <span key={`f-${i}`} style={{ display: "block", color: "#a00" }}>
+                                ❌ {f.slot
+                                  ? `${DAY_FULL_NL[parseDateLocal(slotDateKey(f.slot.date)).getDay()]} ${parseDateLocal(slotDateKey(f.slot.date)).getDate()} ${MONTH_SHORT_NL[parseDateLocal(slotDateKey(f.slot.date)).getMonth()]} · ${getTime(f.slot)}`
+                                  : "onbekend slot"}
+                                {" "}
+                                <small>({f.error})</small>
+                              </span>
+                            ))}
+                          </span>
+                        </div>
+                        <div className="success-card-row success-card-row--total">
+                          <span className="success-card-label">Totaal</span>
+                          <span className="success-card-total">€{successData.total}</span>
+                        </div>
+                      </div>
+                      <button className="btn-primary" style={{ marginTop:24 }} onClick={handleBookMore}>
+                        Nog meer slots boeken
+                      </button>
+                    </div>
+                      </div> : null}
+                      onFinish={(klaar) => {
+                        if (!klaar) return;
+                        succesWas.current = successRef.current?.getBoundingClientRect().top ?? null;
+                        // Nu pas de selectie wissen: zo blijft het formulier staan zolang de golf eroverheen gaat
+                        setFormData((current) => ({ ...current, players: 2 }));
+                        setPlayersSelected(false);
+                        setSelectedSlotIds(new Set());
+                        setSelectedDate(null);
+                        setGolfRustig(true);
+                      }}
+                    >
+                    <div ref={layoutRef}>
                   <div className="bk-layout">
 
                     {/* ── LEFT: Calendar ── */}
@@ -713,7 +799,7 @@ export default function HomePageClient({
                                         : "Hier sturen we je bevestiging naartoe via WhatsApp."}
                                   </p>
                                 </div>
-                                <button type="submit" disabled={submitting || !phoneCanon} className="btn-confirm">
+                                <button type="submit" ref={submitRef} disabled={submitting || !phoneCanon} className="btn-confirm">
                                   {submitting
                                     ? <span className="spinner-row"><ThinkingOrb state="composing" size={20} theme="dark" aria-label="Boeking versturen…" />Versturen…</span>
                                     : cartSlots.length === 1
@@ -727,6 +813,8 @@ export default function HomePageClient({
                       )}
                     </div>
                   </div>
+                    </div>
+                    </DistortionWave>
                 )}
               </div>
             </motion.div>
