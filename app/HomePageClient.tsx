@@ -193,6 +193,15 @@ export default function HomePageClient({
     }
   }, [selectedTrainer]);
 
+  // Het successcherm bovenaan wat je ziet zetten, niet onder de balk bovenin, en nooit buiten
+  // het vak (anders wordt het vak even hoger). Gemeten vóór het tekenen.
+  useLayoutEffect(() => {
+    if (!successData || golfRustig || !successRef.current || !layoutRef.current) return;
+    const vak = layoutRef.current.getBoundingClientRect();
+    const kop = document.querySelector("nav")?.getBoundingClientRect().bottom ?? 0;
+    setSuccesTop(Math.max(0, Math.min(kop + 16 - vak.top, vak.height - successRef.current.offsetHeight)));
+  }, [successData, golfRustig]);
+
   // Na de golf krimpt het vak tot alleen het successcherm: houd dat scherm op dezelfde
   // plek in beeld (anders blijft de scroll-offset op de Kobro-sectie hangen)
   useLayoutEffect(() => {
@@ -303,9 +312,13 @@ export default function HomePageClient({
     setError(null);
     setSuccessData(null);
     setGolfRustig(false);
+    setSubmitting(false);
   }
   function handleBackToTrainers() {
     setSelectedTrainer(null);
+    setSuccessData(null);
+    setGolfRustig(false);
+    setSubmitting(false);
     setSelectedDate(null);
     setSelectedSlotIds(new Set());
     setError(null);
@@ -315,6 +328,7 @@ export default function HomePageClient({
     // Behoud trainer + datum, wis selectie + success
     setSuccessData(null);
     setGolfRustig(false);
+    setSubmitting(false);
     setSelectedSlotIds(new Set());
     setError(null);
     setTimeout(() => calendarRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 60);
@@ -368,13 +382,10 @@ export default function HomePageClient({
         total: bookedSlots.reduce((sum, s) => sum + getPrice(formData.players, getTime(s), s.date), 0),
         trainerName: trainer.name,
       });
-      // Het successcherm bovenaan wat je ziet zetten, niet onder de balk bovenin (de selectie wist onFinish van de golf)
-      const vak = layoutRef.current?.getBoundingClientRect();
-      const kop = document.querySelector("nav")?.getBoundingClientRect().bottom ?? 0;
-      if (vak) setSuccesTop(Math.max(0, kop + 16 - vak.top));
+      // De knop blijft op "Versturen…" tot de golf klaar is (onFinish): geen tweede klik en geen
+      // terugspringende knop terwijl het pakket de foto's maakt. De selectie wist onFinish ook.
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Er is iets misgegaan.");
-    } finally {
       setSubmitting(false);
     }
   }
@@ -635,6 +646,7 @@ export default function HomePageClient({
                         setSelectedSlotIds(new Set());
                         setSelectedDate(null);
                         setGolfRustig(true);
+                        setSubmitting(false);
                       }}
                     >
                     <div ref={layoutRef}>
